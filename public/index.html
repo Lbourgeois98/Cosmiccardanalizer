@@ -245,4 +245,107 @@
             </button>
         </div>
         <div id="results" class="results">
-            <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">
+            <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">🔍 ANALYSIS RESULTS</h2>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Replace with your Stripe publishable key
+        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontFamily: "'Orbitron', monospace",
+                    fontSize: '18px',
+                    color: '#00ff88',
+                    '::placeholder': { color: '#00ccff' }
+                }
+            }
+        });
+        cardElement.mount('#card-element');
+
+        function showError(msg) {
+            document.getElementById('resultContent').innerHTML = `<div class="error">🚨 ${msg}</div>`;
+            document.getElementById('results').classList.add('show');
+        }
+
+        async function analyzeCard() {
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Scanning cosmic signature...</div>`;
+            document.getElementById('results').classList.add('show');
+
+            try {
+                const { paymentMethod, error } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                    billing_details: { name: 'Cosmic User' }
+                });
+
+                if (error) throw error;
+
+                const card = paymentMethod.card;
+                resultContent.innerHTML = `
+                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${card.brand.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">💰 FUNDING:</span><span class="result-value">${card.funding.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${card.country}</span></div>
+                    <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${card.exp_month}/${card.exp_year}</span></div>
+                    <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${card.last4}</span></div>
+                    <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
+                        ✅ Card is valid and ready for testing.
+                    </div>
+                `;
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        async function runTestTransaction() {
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 test transaction...</div>`;
+            document.getElementById('results').classList.add('show');
+
+            try {
+                const response = await fetch('/api/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: 50 })
+                });
+                const { clientSecret } = await response.json();
+
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: { name: 'Cosmic Test User' }
+                    }
+                });
+
+                if (error) throw error;
+
+                if (paymentIntent.status === 'succeeded') {
+                    resultContent.innerHTML = `
+                        <div style="text-align:center;color:#00ff88;">
+                            ✅ SUCCESS!<br><br>
+                            <strong>$0.50 TEST TRANSACTION COMPLETED</strong><br>
+                            ID: ${paymentIntent.id}<br>Status: ${paymentIntent.status}
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                showError('Failed: ' + err.message);
+            }
+        }
+
+        // Create stars
+        document.querySelector('.stars').innerHTML = Array(100).fill().map(() => {
+            const s = document.createElement('div');
+            s.classList.add('star');
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.width = s.style.height = Math.random() * 3 + 1 + 'px';
+            return s.outerHTML;
+        }).join('');
+    </script>
+</body>
+</html>
