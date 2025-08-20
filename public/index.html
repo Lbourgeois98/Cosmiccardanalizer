@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmic Card Analyzer</title>
-    <!-- Load Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
         * {
@@ -37,8 +35,14 @@
             border-radius: 50%;
             animation: twinkle 3s infinite alternate;
         }
-        .star:nth-child(odd) { background: #00ccff; animation-delay: 1s; }
-        .star:nth-child(3n) { background: #ff0088; animation-delay: 2s; }
+        .star:nth-child(odd) {
+            background: #00ccff;
+            animation-delay: 1s;
+        }
+        .star:nth-child(3n) {
+            background: #ff0088;
+            animation-delay: 2s;
+        }
         @keyframes twinkle {
             0% { opacity: 0.3; transform: scale(0.8); }
             100% { opacity: 1; transform: scale(1.2); }
@@ -57,7 +61,6 @@
             0%, 100% { transform: translateY(0px) rotate(-5deg); }
             50% { transform: translateY(-30px) rotate(5deg); }
         }
-        /* UFO */
         .ufo {
             position: fixed;
             left: 5%;
@@ -124,7 +127,7 @@
             color: #00ff88;
             text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
-        #card-element {
+        .card-input {
             width: 100%;
             padding: 15px 20px;
             font-size: 1.2em;
@@ -134,32 +137,35 @@
             border-radius: 10px;
             color: #00ff88;
             outline: none;
+            transition: all 0.3s ease;
         }
-        .btn {
+        .card-input:focus {
+            border-color: #00ccff;
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+            transform: scale(1.02);
+        }
+        .analyze-btn {
             width: 100%;
             padding: 15px;
             font-size: 1.3em;
             font-family: 'Orbitron', monospace;
             font-weight: 700;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
             border: none;
             border-radius: 10px;
+            color: #000;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-top: 10px;
         }
-        .analyze-btn {
-            background: linear-gradient(45deg, #00ff88, #00ccff);
-            color: #000;
-        }
-        .test-btn {
-            background: linear-gradient(45deg, #00ccff, #ff0088);
-            color: white;
-        }
-        .btn:hover {
+        .analyze-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+            background: linear-gradient(45deg, #00ccff, #ff0088);
+        }
+        .analyze-btn:active {
+            transform: translateY(0);
         }
         .results {
             background: rgba(0, 204, 255, 0.1);
@@ -234,154 +240,163 @@
     <div class="container">
         <div class="header">
             <h1 class="title">COSMIC CARD ANALYZER</h1>
-            <p class="subtitle">🚀 Live Mode: Connected to Stripe</p>
+            <p class="subtitle">🚀 Intergalactic Payment Intelligence 🌌</p>
         </div>
         <div class="card-form">
             <div class="input-group">
-                <label class="input-label">Enter Card:</label>
-                <div id="card-element"></div>
+                <label class="input-label" for="cardNumber">Enter Card Number:</label>
+                <input 
+                    type="text" 
+                    id="cardNumber" 
+                    class="card-input" 
+                    placeholder="4111 1111 1111 1111"
+                    maxlength="19"
+                >
             </div>
-            <button class="btn analyze-btn" onclick="analyzeCard()">
-                🔍 ANALYZE CARD INFO
-            </button>
-            <button class="btn test-btn" onclick="testTransaction()">
-                💳 TEST $0.50 TRANSACTION
+            <button class="analyze-btn" onclick="analyzeCard()">
+                🔍 ANALYZE COSMIC SIGNATURE
             </button>
         </div>
         <div id="results" class="results">
-            <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">🔍 ANALYSIS RESULTS</h2>
+            <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">🌟 COSMIC ANALYSIS RESULTS 🌟</h2>
             <div id="resultContent"></div>
         </div>
     </div>
 
     <script>
-        // Replace with your Stripe publishable key
-        const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO'); // Will be replaced in Vercel
-        const elements = stripe.elements();
-        const cardElement = elements.create('card', {
-            style: {
-                base: {
-                    fontFamily: "'Orbitron', monospace",
-                    fontSize: '18px',
-                    color: '#00ff88',
-                    '::placeholder': { color: '#00ccff' }
-                }
+        // Create animated stars
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Format card number input
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            if (formattedValue !== e.target.value) {
+                e.target.value = formattedValue;
             }
         });
-        cardElement.mount('#card-element');
 
-        function showError(msg) {
-            document.getElementById('resultContent').innerHTML = `<div class="error">🚨 ${msg}</div>`;
-            document.getElementById('results').classList.add('show');
-        }
+        // Allow Enter key to submit
+        document.getElementById('cardNumber').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                analyzeCard();
+            }
+        });
 
         async function analyzeCard() {
-    const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-    const resultsDiv = document.getElementById('results');
-    const resultContent = document.getElementById('resultContent');
+            const cardNumberInput = document.getElementById('cardNumber');
+            const cardNumber = cardNumberInput.value.replace(/\s/g, '');
+            const resultsDiv = document.getElementById('results');
+            const resultContent = document.getElementById('resultContent');
 
-    if (!cardNumber || cardNumber.length < 6) {
-        showError('Please enter at least the first 6 digits of the card number.');
-        return;
-    }
+            if (!cardNumber || cardNumber.length < 6) {
+                showError('Please enter at least the first 6 digits of the card number.');
+                return;
+            }
 
-    resultContent.innerHTML = `
-        <div class="loading">
-            <span class="spinner"></span>
-            Scanning cosmic frequencies...
-        </div>
-    `;
-    resultsDiv.classList.add('show');
+            // Show loading
+            resultContent.innerHTML = `
+                <div class="loading">
+                    <span class="spinner"></span>
+                    Scanning cosmic frequencies...
+                </div>
+            `;
+            resultsDiv.classList.add('show');
 
-    try {
-        // ✅ Correct: Get BIN from input, not from undefined card object
-        const bin = cardNumber.substring(0, 6);
+            try {
+                const bin = cardNumber.substring(0, 6);
 
-        // Use local BIN analysis (since binlist.net is blocked in browser)
-        const localData = analyzeBinLocally(bin);
-        displayResults(localData, cardNumber);
-    } catch (err) {
-        showError('Analysis failed: ' + err.message);
-    }
-}
-                });
+                // Try external API (will fail in browser due to CORS, but safe to try)
+                let data;
+                try {
+                    const response = await fetch(`https://lookup.binlist.net/${bin}`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (response.ok) {
+                        data = await response.json();
+                        displayResults(data, cardNumber);
+                        return;
+                    }
+                } catch (error) {
+                    console.log('External API failed (CORS expected), using local analysis');
+                }
 
-                if (error) throw error;
+                // Fallback: Local BIN analysis
+                const localData = analyzeBinLocally(bin);
+                displayResults(localData, cardNumber);
 
-                const card = paymentMethod.card;
-                const bin = card.number.substring(0, 6);
-
-                const localData = {
-                    bank: getIssuerBank(bin),
-                    scheme: card.brand.toUpperCase(),
-                    type: card.funding.toUpperCase(),
-                    level: getCardLevel(bin),
-                    country: card.country,
-                    currency: 'USD',
-                    bin: bin,
-                    masked: `${bin}••••••${card.last4}`
-                };
-
-                resultContent.innerHTML = `
-                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${localData.bank}</span></div>
-                    <div class="result-item"><span class="result-label">🎴 SCHEME:</span><span class="result-value">${localData.scheme}</span></div>
-                    <div class="result-item"><span class="result-label">💳 TYPE:</span><span class="result-value">${localData.type}</span></div>
-                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${localData.level}</span></div>
-                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${localData.country}</span></div>
-                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${localData.bin}</span></div>
-                    <div class="result-item"><span class="result-label">🎯 MASKED:</span><span class="result-value">${localData.masked}</span></div>
-                    <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        ✅ Card info retrieved. No transaction attempted.
-                    </div>
-                `;
-            } catch (err) {
-                showError(err.message);
+            } catch (error) {
+                console.error('Analysis error:', error);
+                showError('An error occurred during analysis. Please try again.');
             }
         }
 
-        async function testTransaction() {
-            const resultContent = document.getElementById('resultContent');
-            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 transaction...</div>`;
-            document.getElementById('results').classList.add('show');
+        function analyzeBinLocally(bin) {
+            const binData = {
+                scheme: 'UNKNOWN',
+                type: 'UNKNOWN',
+                brand: 'UNKNOWN',
+                bank: { name: 'UNKNOWN' },
+                country: { name: 'United States', currency: 'USD', iso: 'US' },
+                prepaid: null,
+                level: 'UNKNOWN'
+            };
 
-            try {
-                const response = await fetch('/api/create-payment-intent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: 50 })
-                });
-                const { clientSecret } = await response.json();
+            const firstDigit = bin[0];
+            const firstTwo = bin.substring(0, 2);
+            const firstFour = bin.substring(0, 4);
 
-                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                    payment_method: {
-                        card: cardElement,
-                        billing_details: { name: 'Cosmic Test User' }
-                    }
-                });
-
-                if (error) throw error;
-
-                const card = paymentIntent.charges.data[0].payment_method_details.card;
-
-                resultContent.innerHTML = `
-                    <div class="result-item"><span class="result-label">✅ STATUS:</span><span class="result-value" style="color:#00ff88;">ACTIVE ✅</span></div>
-                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${card.brand.toUpperCase()}</span></div>
-                    <div class="result-item"><span class="result-label">💰 FUNDING:</span><span class="result-value">${card.funding.toUpperCase()}</span></div>
-                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${getIssuerBank(card.number.substring(0,6))}</span></div>
-                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${card.country}</span></div>
-                    <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${card.last4}</span></div>
-                    <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${card.exp_month}/${card.exp_year}</span></div>
-                    <div class="result-item"><span class="result-label">💸 AMOUNT:</span><span class="result-value">$0.50</span></div>
-                    <div class="result-item"><span class="result-label">🆔 ID:</span><span class="result-value" style="font-size:0.8em;">${paymentIntent.id}</span></div>
-                `;
-            } catch (err) {
-                resultContent.innerHTML = `
-                    <div class="result-item"><span class="result-label">❌ STATUS:</span><span class="result-value" style="color:#ff0088;">INACTIVE ❌</span></div>
-                    <div style="margin-top:10px;color:#ff0088;font-size:0.9em;text-align:center;">
-                        Failed: ${err.message}
-                    </div>
-                `;
+            if (firstDigit === '4') {
+                binData.scheme = 'VISA';
+                binData.brand = 'VISA';
+                binData.type = getBinType(bin);
+                binData.level = getCardLevel(bin);
+                binData.bank.name = getIssuerBank(bin);
             }
+            else if ((firstTwo >= '51' && firstTwo <= '55') || (firstFour >= '2221' && firstFour <= '2720')) {
+                binData.scheme = 'MASTERCARD';
+                binData.brand = 'MASTERCARD';
+                binData.type = getBinType(bin);
+                binData.level = getCardLevel(bin);
+                binData.bank.name = getIssuerBank(bin);
+            }
+            else if (firstTwo === '34' || firstTwo === '37') {
+                binData.scheme = 'AMERICAN EXPRESS';
+                binData.brand = 'AMERICAN EXPRESS';
+                binData.type = 'CREDIT';
+                binData.level = getCardLevel(bin);
+                binData.bank.name = getIssuerBank(bin);
+            }
+            else if (firstFour === '6011' || firstTwo === '65' || (firstFour >= '6440' && firstFour <= '6449')) {
+                binData.scheme = 'DISCOVER';
+                binData.brand = 'DISCOVER';
+                binData.type = getBinType(bin);
+                binData.level = getCardLevel(bin);
+                binData.bank.name = getIssuerBank(bin);
+            }
+
+            return binData;
+        }
+
+        function getBinType(bin) {
+            const firstFour = bin.substring(0, 4);
+            const debitRanges = ['4000', '4111', '4444', '5555'];
+            if (debitRanges.some(range => firstFour.startsWith(range))) {
+                return 'DEBIT';
+            }
+            return 'CREDIT';
         }
 
         function getCardLevel(bin) {
@@ -389,36 +404,118 @@
             if (firstFour >= '4000' && firstFour <= '4199') return 'CLASSIC';
             if (firstFour >= '4200' && firstFour <= '4399') return 'GOLD';
             if (firstFour >= '4400' && firstFour <= '4599') return 'PLATINUM';
+            if (firstFour >= '4600' && firstFour <= '4799') return 'SIGNATURE';
             return 'STANDARD';
         }
 
         function getIssuerBank(bin) {
-            const banks = {
+            const binToBank = {
                 '411111': 'VISA TEST BANK',
                 '424242': 'STRIPE TEST BANK',
                 '454545': 'MASTERCARD TEST BANK',
                 '555555': 'MASTERCARD TEST BANK',
                 '378282': 'AMERICAN EXPRESS',
-                '443040': 'CAPITAL ONE',
+                '371449': 'AMERICAN EXPRESS',
+                '601111': 'DISCOVER TEST',
+                '443040': 'CAPITAL ONE BANK (USA), N.A.',
                 '414720': 'CHASE BANK',
-                '476173': 'WELLS FARGO',
-                '533875': 'CITIBANK'
+                '476173': 'WELLS FARGO BANK',
+                '533875': 'CITIBANK',
+                '491764': 'BANK OF AMERICA'
             };
-            for (let prefix in banks) {
-                if (bin.startsWith(prefix)) return banks[prefix];
+            for (let prefix in binToBank) {
+                if (bin.startsWith(prefix)) return binToBank[prefix];
             }
+            const firstTwo = bin.substring(0, 2);
+            if (firstTwo >= '40' && firstTwo <= '49') return 'MAJOR US BANK';
+            if (firstTwo >= '50' && firstTwo <= '59') return 'FINANCIAL INSTITUTION';
             return 'ISSUING BANK';
         }
 
-        // Create stars
-        document.querySelector('.stars').innerHTML = Array(100).fill().map(() => {
-            const s = document.createElement('div');
-            s.classList.add('star');
-            s.style.left = Math.random() * 100 + '%';
-            s.style.top = Math.random() * 100 + '%';
-            s.style.width = s.style.height = Math.random() * 3 + 1 + 'px';
-            return s.outerHTML;
-        }).join('');
+        function luhnCheck(cardNumber) {
+            const digits = cardNumber.replace(/\D/g, '').split('').map(Number);
+            let sum = 0;
+            let isEven = false;
+            for (let i = digits.length - 1; i >= 0; i--) {
+                let digit = digits[i];
+                if (isEven) {
+                    digit *= 2;
+                    if (digit > 9) digit -= 9;
+                }
+                sum += digit;
+                isEven = !isEven;
+            }
+            return sum % 10 === 0;
+        }
+
+        function displayResults(data, cardNumber) {
+            const resultContent = document.getElementById('resultContent');
+            const scheme = data.scheme || 'UNKNOWN';
+            const type = data.type || 'UNKNOWN';
+            const brand = data.brand || 'UNKNOWN';
+            const bank = data.bank?.name || 'UNKNOWN';
+            const country = data.country?.name || 'United States';
+            const currency = data.country?.currency || 'USD';
+            const iso = data.country?.iso || 'US';
+            const level = data.level || 'UNKNOWN';
+
+            const luhnValid = luhnCheck(cardNumber);
+            const maskedNumber = cardNumber.substring(0, 6) + '••••••' + cardNumber.substring(cardNumber.length - 4);
+
+            resultContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">🏦 ISSUER/BANK:</span>
+                    <span class="result-value">${bank}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">🎴 CARD BRAND:</span>
+                    <span class="result-value">${scheme}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">💳 CARD TYPE:</span>
+                    <span class="result-value">${type.toUpperCase()}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">⭐ CARD LEVEL:</span>
+                    <span class="result-value">${level}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">🌍 COUNTRY:</span>
+                    <span class="result-value">${country} (${iso})</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">💰 CURRENCY:</span>
+                    <span class="result-value">${currency}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">🔢 BIN:</span>
+                    <span class="result-value">${cardNumber.substring(0, 6)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">🎯 MASKED NUMBER:</span>
+                    <span class="result-value">${maskedNumber}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">✅ LUHN VALIDATION:</span>
+                    <span class="result-value" style="color: ${luhnValid ? '#00ff88' : '#ff0088'};">
+                        ${luhnValid ? 'VALID ✅' : 'INVALID ❌'}
+                    </span>
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(0, 204, 255, 0.1); border-radius: 10px; font-size: 0.9em; color: #00ccff;">
+                    <strong>Business Use:</strong> For payment validation only. No sensitive data stored.
+                </div>
+            `;
+            resultsDiv.classList.add('show');
+        }
+
+        function showError(message) {
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = `<div class="error">🚨 ${message}</div>`;
+            document.getElementById('results').classList.add('show');
+        }
+
+        // Initialize on load
+        createStars();
     </script>
 </body>
 </html>
