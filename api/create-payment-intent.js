@@ -1,11 +1,13 @@
 // api/create-payment-intent.js
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-module.exports = async function (req, res) {
+module.exports = async (req, res) => {
   if (req.method === 'POST') {
     try {
+      const { amount = 50 } = req.body;
+
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: req.body.amount || 50,
+        amount,
         currency: 'usd',
         automatic_payment_methods: { enabled: true },
       });
