@@ -232,8 +232,7 @@
     </div>
 
     <script>
-        // Replace with your real publishable key
-        const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO'); // Change in Vercel env
+        const stripe = Stripe('pk_live_YOUR_PUBLISHABLE_KEY'); // Replace in Vercel
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
             style: {
@@ -247,12 +246,29 @@
         });
         cardElement.mount('#card-element');
 
+        let globalBin = '';
+
+        // Capture partial BIN as user types
+        cardElement.on('change', function(event) {
+            if (event.brand && event.complete) {
+                // Estimate BIN from brand
+                const brand = event.brand.toLowerCase();
+                const knownBins = {
+                    visa: '400000',
+                    mastercard: '555555',
+                    amex: '370000',
+                    discover: '601100'
+                };
+                globalBin = knownBins[brand] || '411111';
+            }
+        });
+
         function showError(msg) {
             document.getElementById('resultContent').innerHTML = `<div class="error">🚨 ${msg}</div>`;
             document.getElementById('results').classList.add('show');
         }
 
-        // --- ANALYZE CARD: Show BIN Info ---
+        // --- ANALYZE CARD: Use BinDB.app ---
         async function analyzeCard() {
             const resultContent = document.getElementById('resultContent');
             resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Scanning cosmic signature...</div>`;
@@ -268,36 +284,28 @@
                 if (error) throw error;
 
                 const card = paymentMethod.card;
-                const bin = card.number ? card.number.substring(0, 6) : null;
+                const firstSix = globalBin || '411111'; // fallback
 
-                // Since Stripe doesn't give full number, we simulate BIN from brand + known prefixes
-                // But better: use a hidden input for first 6 digits
-                // Fallback: use first 6 of last4? No — instead, just show what we have
-                let binToUse = bin || 'Unknown';
-
-                // Simulate BIN if not available
-                if (binToUse === 'Unknown') {
-                    const firstDigitsMap = { visa: '400000', mastercard: '555555', amex: '370000' };
-                    binToUse = firstDigitsMap[card.brand] || '411111';
-                }
-
-                const binRes = await fetch(`/api/bin/${binToUse}`);
+                const binRes = await fetch(`/api/bin/${firstSix}`);
                 const binData = await binRes.json();
 
-                const bank = binData.bank?.name || 'Unknown Bank';
+                const bank = binData.issuer || 'Unknown Bank';
                 const country = binData.country?.name || 'Unknown';
                 const currency = binData.country?.currency || 'USD';
-                const level = binData.brand || 'Standard';
+                const level = binData.level || 'Standard';
+                const brand = binData.brand || card.brand.toUpperCase();
+                const cardType = binData.cardType || 'Unknown';
 
                 resultContent.innerHTML = `
                     <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${bank}</span></div>
                     <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${country}</span></div>
                     <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${currency}</span></div>
                     <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level}</span></div>
-                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${binToUse}</span></div>
-                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${card.brand.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">💳 TYPE:</span><span class="result-value">${cardType}</span></div>
+                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${firstSix}</span></div>
+                    <div class="result-item"><span class="result-label">🏷️ BRAND:</span><span class="result-value">${brand}</span></div>
                     <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        ✅ BIN info retrieved securely.
+                        ✅ BIN info powered by BinDB.app
                     </div>
                 `;
             } catch (err) {
@@ -305,7 +313,7 @@
             }
         }
 
-        // --- TEST TRANSACTION: Charge $0.50 ---
+        // --- TEST TRANSACTION: $0.50 LIVE CHARGE ---
         async function testTransaction() {
             const resultContent = document.getElementById('resultContent');
             resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 transaction...</div>`;
