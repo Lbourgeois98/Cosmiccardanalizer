@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmic Card Analyzer</title>
+    <!-- Load Stripe.js only for transaction -->
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -85,14 +86,24 @@
             color: #00ccff;
             text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
         }
-        .card-form {
+
+        .section {
             background: rgba(0, 255, 136, 0.1);
             border: 2px solid #00ff88;
             border-radius: 20px;
-            padding: 30px;
+            padding: 25px;
             margin-bottom: 30px;
             backdrop-filter: blur(10px);
             box-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
+        }
+        .section h2 {
+            color: #00ccff;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.8em;
+        }
+        .input-group {
+            margin-bottom: 15px;
         }
         .input-label {
             display: block;
@@ -101,9 +112,9 @@
             color: #00ff88;
             text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
-        #card-element {
+        input[type="text"], input[type="number"] {
             width: 100%;
-            padding: 15px 20px;
+            padding: 15px;
             font-size: 1.2em;
             font-family: 'Orbitron', monospace;
             background: rgba(0, 0, 0, 0.7);
@@ -208,23 +219,29 @@
     <div class="stars"></div>
     <div class="alien">👽</div>
     <div class="ufo">🛸</div>
+
     <div class="container">
-        <div class="header">
-            <h1 class="title">COSMIC CARD ANALYZER</h1>
-            <p class="subtitle">🚀 Live Mode</p>
-        </div>
-        <div class="card-form">
+        <!-- ANALYZE CARD SECTION (Plain Input, No Stripe) -->
+        <div class="section">
+            <h2>🔍 Analyze Card Info</h2>
             <div class="input-group">
-                <label class="input-label">Enter Card:</label>
+                <label class="input-label">Card Number (First 6 Digits)</label>
+                <input type="text" id="bin-input" placeholder="Enter first 6 digits" maxlength="6" inputmode="numeric">
+            </div>
+            <button class="btn analyze-btn" onclick="analyzeCard()">🔍 ANALYZE CARD INFO</button>
+        </div>
+
+        <!-- TEST TRANSACTION SECTION (Uses Stripe) -->
+        <div class="section">
+            <h2>💳 Test $0.50 Transaction</h2>
+            <div class="input-group">
+                <label class="input-label">Enter Full Card</label>
                 <div id="card-element"></div>
             </div>
-            <button class="btn analyze-btn" onclick="analyzeCard()">
-                🔍 ANALYZE CARD INFO
-            </button>
-            <button class="btn test-btn" onclick="testTransaction()">
-                💳 TEST $0.50 TRANSACTION
-            </button>
+            <button class="btn test-btn" onclick="testTransaction()">💳 TEST $0.50 TRANSACTION</button>
         </div>
+
+        <!-- RESULTS -->
         <div id="results" class="results">
             <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">🔍 ANALYSIS RESULTS</h2>
             <div id="resultContent"></div>
@@ -232,7 +249,51 @@
     </div>
 
     <script>
-        // Replace with your real publishable key
+        // =============== ANALYZE CARD (No Stripe) ===============
+        async function analyzeCard() {
+            const resultContent = document.getElementById('resultContent');
+            const binInput = document.getElementById('bin-input').value.replace(/\D/g, '');
+
+            if (binInput.length < 6) {
+                resultContent.innerHTML = `<div class="error">🚨 Please enter at least 6 digits</div>`;
+                document.getElementById('results').classList.add('show');
+                return;
+            }
+
+            const bin = binInput.slice(0, 6);
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Looking up BIN info...</div>`;
+            document.getElementById('results').classList.add('show');
+
+            try {
+                const res = await fetch(`/api/bin/${bin}`);
+                const data = await res.json();
+
+                const brand = data.brand || 'Unknown';
+                const bank = data.issuer || 'Unknown Bank';
+                const country = data.country?.name || 'Unknown';
+                const currency = data.country?.currency || 'USD';
+                const level = data.level || 'Unknown';
+                const cardType = data.cardType || 'Unknown';
+
+                resultContent.innerHTML = `
+                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${bin}</span></div>
+                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${brand}</span></div>
+                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${bank}</span></div>
+                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${country}</span></div>
+                    <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${currency}</span></div>
+                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level}</span></div>
+                    <div class="result-item"><span class="result-label">🔍 TYPE:</span><span class="result-value">${cardType}</span></div>
+                    <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
+                        ✅ Powered by <a href="https://bindb.app" target="_blank" style="color:#00ff88">BinDB.app</a>
+                    </div>
+                `;
+            } catch (err) {
+                resultContent.innerHTML = `<div class="error">🚨 BIN lookup failed: ${err.message}</div>`;
+            }
+        }
+
+        // =============== TEST TRANSACTION (Uses Stripe) ===============
+        // Replace with your publishable key
         const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO');
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
@@ -247,79 +308,18 @@
         });
         cardElement.mount('#card-element');
 
-        // Store the actual card number as user types
-        let cardNumber = '';
-
-        // Listen to input events on the card element
-        cardElement.on('change', function(event) {
-            if (event.brand && event.brand !== 'unknown') {
-                // Update card number only if valid digits are entered
-                if (event.value && event.value.card) {
-                    cardNumber = event.value.card.number.replace(/\D/g, '');
-                }
-            }
-        });
-
-        function showError(msg) {
-            document.getElementById('resultContent').innerHTML = `<div class="error">🚨 ${msg}</div>`;
-            document.getElementById('results').classList.add('show');
-        }
-
-        // --- ANALYZE CARD: Use actual BIN from input ---
-        async function analyzeCard() {
-            const resultContent = document.getElementById('resultContent');
-            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Scanning cosmic signature...</div>`;
-            document.getElementById('results').classList.add('show');
-
-            try {
-                // Get first 6 digits
-                const bin = cardNumber.slice(0, 6);
-
-                if (bin.length < 6) {
-                    throw new Error('Please enter at least 6 digits of the card');
-                }
-
-                // Fetch BIN data from your backend
-                const binRes = await fetch(`/api/bin/${bin}`);
-                const binData = await binRes.json();
-
-                const brand = binData.brand || 'Unknown';
-                const bank = binData.issuer || 'Unknown Bank';
-                const country = binData.country?.name || 'Unknown';
-                const currency = binData.country?.currency || 'USD';
-                const level = binData.level || 'Unknown';
-                const cardType = binData.cardType || 'Unknown';
-
-                resultContent.innerHTML = `
-                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${bin}</span></div>
-                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${brand}</span></div>
-                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${bank}</span></div>
-                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${country}</span></div>
-                    <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${currency}</span></div>
-                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level}</span></div>
-                    <div class="result-item"><span class="result-label">🔍 TYPE:</span><span class="result-value">${cardType}</span></div>
-                    <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        ✅ Accurate BIN info powered by <a href="https://bindb.app" target="_blank" style="color:#00ff88">BinDB.app</a>
-                    </div>
-                `;
-            } catch (err) {
-                showError(err.message);
-            }
-        }
-
-        // --- TEST TRANSACTION: $0.50 LIVE CHARGE ---
         async function testTransaction() {
             const resultContent = document.getElementById('resultContent');
             resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 transaction...</div>`;
             document.getElementById('results').classList.add('show');
 
             try {
-                const res = await fetch('/api/create-payment-intent', {
+                const response = await fetch('/api/create-payment-intent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amount: 50 })
                 });
-                const { clientSecret } = await res.json();
+                const { clientSecret } = await response.json();
 
                 const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
                     payment_method: {
@@ -343,10 +343,10 @@
                         </div>
                     `;
                 } else {
-                    showError(`Payment failed: ${paymentIntent.status}`);
+                    resultContent.innerHTML = `<div class="error">❌ Payment failed: ${paymentIntent.status}</div>`;
                 }
             } catch (err) {
-                showError(`Card invalid: ${err.message}`);
+                resultContent.innerHTML = `<div class="error">❌ Card invalid: ${err.message}</div>`;
             }
         }
 
