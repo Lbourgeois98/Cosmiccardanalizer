@@ -1,7 +1,6 @@
 {
   "name": "cosmic-card-analyzer",
   "version": "1.0.0",
-  "description": "Cosmic Card Analyzer with Stripe & Vercel",
   "main": "index.js",
   "scripts": {
     "test": "echo \"No test specified\" && exit 1"
