@@ -232,7 +232,8 @@
     </div>
 
     <script>
-        const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO'); // Replace in Vercel
+        // Replace with your real publishable key
+        const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO');
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
             style: {
@@ -246,20 +247,16 @@
         });
         cardElement.mount('#card-element');
 
-        let globalBin = '';
+        // Store the actual card number as user types
+        let cardNumber = '';
 
-        // Capture partial BIN as user types
+        // Listen to input events on the card element
         cardElement.on('change', function(event) {
-            if (event.brand && event.complete) {
-                // Estimate BIN from brand
-                const brand = event.brand.toLowerCase();
-                const knownBins = {
-                    visa: '400000',
-                    mastercard: '555555',
-                    amex: '370000',
-                    discover: '601100'
-                };
-                globalBin = knownBins[brand] || '411111';
+            if (event.brand && event.brand !== 'unknown') {
+                // Update card number only if valid digits are entered
+                if (event.value && event.value.card) {
+                    cardNumber = event.value.card.number.replace(/\D/g, '');
+                }
             }
         });
 
@@ -268,44 +265,41 @@
             document.getElementById('results').classList.add('show');
         }
 
-        // --- ANALYZE CARD: Use BinDB.app ---
+        // --- ANALYZE CARD: Use actual BIN from input ---
         async function analyzeCard() {
             const resultContent = document.getElementById('resultContent');
             resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Scanning cosmic signature...</div>`;
             document.getElementById('results').classList.add('show');
 
             try {
-                const { paymentMethod, error } = await stripe.createPaymentMethod({
-                    type: 'card',
-                    card: cardElement,
-                    billing_details: { name: 'Cosmic User' }
-                });
+                // Get first 6 digits
+                const bin = cardNumber.slice(0, 6);
 
-                if (error) throw error;
+                if (bin.length < 6) {
+                    throw new Error('Please enter at least 6 digits of the card');
+                }
 
-                const card = paymentMethod.card;
-                const firstSix = globalBin || '411111'; // fallback
-
-                const binRes = await fetch(`/api/bin/${firstSix}`);
+                // Fetch BIN data from your backend
+                const binRes = await fetch(`/api/bin/${bin}`);
                 const binData = await binRes.json();
 
+                const brand = binData.brand || 'Unknown';
                 const bank = binData.issuer || 'Unknown Bank';
                 const country = binData.country?.name || 'Unknown';
                 const currency = binData.country?.currency || 'USD';
-                const level = binData.level || 'Standard';
-                const brand = binData.brand || card.brand.toUpperCase();
+                const level = binData.level || 'Unknown';
                 const cardType = binData.cardType || 'Unknown';
 
                 resultContent.innerHTML = `
+                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${bin}</span></div>
+                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${brand}</span></div>
                     <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${bank}</span></div>
                     <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${country}</span></div>
                     <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${currency}</span></div>
                     <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level}</span></div>
-                    <div class="result-item"><span class="result-label">💳 TYPE:</span><span class="result-value">${cardType}</span></div>
-                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${firstSix}</span></div>
-                    <div class="result-item"><span class="result-label">🏷️ BRAND:</span><span class="result-value">${brand}</span></div>
+                    <div class="result-item"><span class="result-label">🔍 TYPE:</span><span class="result-value">${cardType}</span></div>
                     <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        ✅ BIN info powered by BinDB.app
+                        ✅ Accurate BIN info powered by <a href="https://bindb.app" target="_blank" style="color:#00ff88">BinDB.app</a>
                     </div>
                 `;
             } catch (err) {
