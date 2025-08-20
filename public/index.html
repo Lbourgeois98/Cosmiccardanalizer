@@ -234,7 +234,7 @@
     <div class="container">
         <div class="header">
             <h1 class="title">COSMIC CARD ANALYZER</h1>
-            <p class="subtitle">🚀 Live Mode: Connected to Stripe</p>
+            <p class="subtitle">🚀 Live Mode</p>
         </div>
         <div class="card-form">
             <div class="input-group">
@@ -256,7 +256,7 @@
 
     <script>
         // Replace with your Stripe publishable key
-        const stripe = Stripe('pk_live_YOUR_REAL_KEY'); // Will be replaced in Vercel
+        const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO'); // Will be replaced in Vercel
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
             style: {
