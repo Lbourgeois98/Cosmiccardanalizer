@@ -1,9 +1,8 @@
-// api/bin/[bin].js
 export default async function handler(req, res) {
   const { bin } = req.query;
 
   if (!/^\d{6}$/.test(bin)) {
-    return res.status(400).json({ error: 'Invalid BIN: must be 6 digits' });
+    return res.status(400).json({ error: 'Invalid BIN' });
   }
 
   try {
@@ -11,14 +10,12 @@ export default async function handler(req, res) {
       headers: { 'Accept': 'application/json' }
     });
 
-    if (!apiRes.ok) {
-      throw new Error('BIN lookup failed');
-    }
+    if (!apiRes.ok) throw new Error('BIN lookup failed');
 
     const data = await apiRes.json();
-    return res.status(200).json(data);
+    res.status(200).json(data);
   } catch (error) {
-    return res.status(200).json({
+    res.status(200).json({
       brand: 'Unknown',
       issuer: 'Unknown Bank',
       level: 'Unknown',
