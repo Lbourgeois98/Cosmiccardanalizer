@@ -276,15 +276,34 @@
         }
 
         async function analyzeCard() {
-            const resultContent = document.getElementById('resultContent');
-            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Scanning cosmic signature...</div>`;
-            document.getElementById('results').classList.add('show');
+    const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    const resultsDiv = document.getElementById('results');
+    const resultContent = document.getElementById('resultContent');
 
-            try {
-                const { paymentMethod, error } = await stripe.createPaymentMethod({
-                    type: 'card',
-                    card: cardElement,
-                    billing_details: { name: 'Cosmic User' }
+    if (!cardNumber || cardNumber.length < 6) {
+        showError('Please enter at least the first 6 digits of the card number.');
+        return;
+    }
+
+    resultContent.innerHTML = `
+        <div class="loading">
+            <span class="spinner"></span>
+            Scanning cosmic frequencies...
+        </div>
+    `;
+    resultsDiv.classList.add('show');
+
+    try {
+        // ✅ Correct: Get BIN from input, not from undefined card object
+        const bin = cardNumber.substring(0, 6);
+
+        // Use local BIN analysis (since binlist.net is blocked in browser)
+        const localData = analyzeBinLocally(bin);
+        displayResults(localData, cardNumber);
+    } catch (err) {
+        showError('Analysis failed: ' + err.message);
+    }
+}
                 });
 
                 if (error) throw error;
