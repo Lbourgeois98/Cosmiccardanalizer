@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmic Card Analyzer</title>
-    <!-- Load Stripe.js -->
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -21,7 +20,6 @@
             overflow-x: hidden;
             position: relative;
         }
-        /* Animated stars */
         .stars {
             position: fixed;
             top: 0;
@@ -37,19 +35,12 @@
             border-radius: 50%;
             animation: twinkle 3s infinite alternate;
         }
-        .star:nth-child(odd) {
-            background: #00ccff;
-            animation-delay: 1s;
-        }
-        .star:nth-child(3n) {
-            background: #ff0088;
-            animation-delay: 2s;
-        }
+        .star:nth-child(odd) { background: #00ccff; animation-delay: 1s; }
+        .star:nth-child(3n) { background: #ff0088; animation-delay: 2s; }
         @keyframes twinkle {
             0% { opacity: 0.3; transform: scale(0.8); }
             100% { opacity: 1; transform: scale(1.2); }
         }
-        /* Floating alien */
         .alien {
             position: fixed;
             right: 10%;
@@ -63,7 +54,6 @@
             0%, 100% { transform: translateY(0px) rotate(-5deg); }
             50% { transform: translateY(-30px) rotate(5deg); }
         }
-        /* UFO */
         .ufo {
             position: fixed;
             left: 5%;
@@ -79,7 +69,6 @@
             50% { transform: translateX(0px) translateY(-10px); }
             75% { transform: translateX(-10px) translateY(-5px); }
         }
-        /* Main container */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -87,7 +76,6 @@
             position: relative;
             z-index: 3;
         }
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -113,7 +101,6 @@
             color: #00ccff;
             text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
         }
-        /* Card form */
         .card-form {
             background: rgba(0, 255, 136, 0.1);
             border: 2px solid #00ff88;
@@ -124,7 +111,7 @@
             box-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
         }
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .input-label {
             display: block;
@@ -133,24 +120,15 @@
             color: #00ff88;
             text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
-        .card-input {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1.2em;
-            font-family: 'Orbitron', monospace;
+        .card-element {
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #00ff88;
             border-radius: 10px;
+            padding: 15px 20px;
+            font-family: 'Orbitron', monospace;
             color: #00ff88;
-            outline: none;
-            transition: all 0.3s ease;
+            font-size: 1.2em;
         }
-        .card-input:focus {
-            border-color: #00ccff;
-            box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
-            transform: scale(1.02);
-        }
-        /* Buttons */
         .btn {
             width: 100%;
             padding: 15px;
@@ -169,7 +147,7 @@
             background: linear-gradient(45deg, #00ff88, #00ccff);
             color: #000;
         }
-        .status-btn {
+        .test-btn {
             background: linear-gradient(45deg, #00ccff, #ff0088);
             color: white;
         }
@@ -177,7 +155,6 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
         }
-        /* Results */
         .results {
             background: rgba(0, 204, 255, 0.1);
             border: 2px solid #00ccff;
@@ -255,20 +232,14 @@
         </div>
         <div class="card-form">
             <div class="input-group">
-                <label class="input-label" for="cardNumber">Enter Card Number:</label>
-                <input 
-                    type="text" 
-                    id="cardNumber" 
-                    class="card-input" 
-                    placeholder="4242 4242 4242 4242"
-                    maxlength="19"
-                >
+                <label class="input-label">Enter Card Details:</label>
+                <div id="card-element" class="card-element"></div>
             </div>
             <button class="btn analyze-btn" onclick="analyzeCard()">
-                🔍 ANALYZE COSMIC SIGNATURE
+                🔍 ANALYZE CARD
             </button>
-            <button class="btn status-btn" onclick="testCardStatus()">
-                🛰️ TEST CARD STATUS
+            <button class="btn test-btn" onclick="testCardTransaction()">
+                💸 TEST $0.50 TRANSACTION
             </button>
         </div>
         <div id="results" class="results">
@@ -278,251 +249,116 @@
     </div>
 
     <script>
-        // Initialize Stripe
-        const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO'); // Replace with your key
-
-        // Create animated stars
-        function createStars() {
-            const starsContainer = document.querySelector('.stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-
-        // Format card number input
-        document.getElementById('cardNumber').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            if (formattedValue !== e.target.value) {
-                e.target.value = formattedValue;
-            }
-        });
-
-        // Allow Enter key
-        document.getElementById('cardNumber').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                analyzeCard();
-            }
-        });
-
-        async function analyzeCard() {
-            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-            const resultsDiv = document.getElementById('results');
-            const resultContent = document.getElementById('resultContent');
-
-            if (!cardNumber || cardNumber.length < 6) {
-                showError('Please enter at least the first 6 digits of the card number.');
-                return;
-            }
-
-            resultContent.innerHTML = `
-                <div class="loading">
-                    <span class="spinner"></span>
-                    Scanning cosmic frequencies...
-                </div>
-            `;
-            resultsDiv.classList.add('show');
-
-            try {
-                const bin = cardNumber.substring(0, 6);
-                const localData = analyzeBinLocally(bin);
-                displayResults(localData, cardNumber);
-            } catch (err) {
-                showError('Analysis failed: ' + err.message);
-            }
-        }
-
-        async function testCardStatus() {
-            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-            const resultsDiv = document.getElementById('results');
-            const resultContent = document.getElementById('resultContent');
-
-            if (!cardNumber || cardNumber.length < 13) {
-                showError('Please enter a valid card number.');
-                return;
-            }
-
-            resultContent.innerHTML = `
-                <div class="loading">
-                    <span class="spinner"></span>
-                    Testing card status via Stripe...
-                </div>
-            `;
-            resultsDiv.classList.add('show');
-
-            try {
-                // Create payment method
-                const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-                    type: 'card',
-                    card: {
-                        number: cardNumber,
-                        exp_month: 12,
-                        exp_year: 2030,
-                        cvc: '123'
-                    }
-                });
-
-                if (pmError) throw new Error(pmError.message);
-
-                // Create PaymentIntent via backend
-                const response = await fetch('/api/create-payment-intent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: 50,
-                        payment_method: paymentMethod.id
-                    })
-                });
-
-                const { success, error, clientSecret } = await response.json();
-
-                if (error) throw new Error(error);
-
-                // Confirm payment
-                const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret);
-
-                if (confirmError) throw new Error(confirmError.message);
-
-                if (paymentIntent.status === 'succeeded' || paymentIntent.status === 'requires_capture') {
-                    resultContent.innerHTML = `
-                        <div class="result-item">
-                            <span class="result-label">✅ CARD STATUS:</span>
-                            <span class="result-value" style="color:#00ff88;">ACTIVE ✅</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">💳 AUTHORIZED:</span>
-                            <span class="result-value">$0.50</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">🆔 TRANSACTION ID:</span>
-                            <span class="result-value" style="font-size:0.9em;">${paymentIntent.id}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">🏦 BANK:</span>
-                            <span class="result-value">${getIssuerBank(cardNumber.substring(0,6))}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">🎴 SCHEME:</span>
-                            <span class="result-value">${getCardScheme(cardNumber)}</span>
-                        </div>
-                    `;
-                } else {
-                    throw new Error('Payment not confirmed');
+        // Replace with your Stripe publishable key
+        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontFamily: "'Orbitron', monospace",
+                    fontSize: '18px',
+                    color: '#00ff88',
+                    '::placeholder': { color: '#00ccff' }
                 }
-            } catch (err) {
-                resultContent.innerHTML = `
-                    <div class="result-item">
-                        <span class="result-label">❌ CARD STATUS:</span>
-                        <span class="result-value" style="color:#ff0088;">INACTIVE ❌</span>
-                    </div>
-                    <div style="margin-top:10px;color:#ff0088;font-size:0.9em;">
-                        Reason: ${err.message}
-                    </div>
-                `;
-            }
-        }
-
-        function getCardScheme(bin) {
-            const first = bin[0];
-            const firstTwo = bin.substring(0, 2);
-            if (first === '4') return 'VISA';
-            if (firstTwo >= '51' && firstTwo <= '55') return 'MASTERCARD';
-            if (firstTwo === '34' || firstTwo === '37') return 'AMERICAN EXPRESS';
-            if (bin.startsWith('6')) return 'DISCOVER';
-            return 'UNKNOWN';
-        }
-
-        function analyzeBinLocally(bin) {
-            const data = {
-                scheme: getCardScheme(bin),
-                type: getBinType(bin),
-                brand: getCardScheme(bin),
-                bank: { name: getIssuerBank(bin) },
-                country: { name: 'United States', currency: 'USD', iso: 'US' },
-                level: getCardLevel(bin)
-            };
-            return data;
-        }
-
-        function getBinType(bin) {
-            const debitBins = ['4000', '4111', '4545', '5555'];
-            const firstFour = bin.substring(0, 4);
-            return debitBins.some(d => firstFour.startsWith(d)) ? 'DEBIT' : 'CREDIT';
-        }
-
-        function getCardLevel(bin) {
-            const firstFour = bin.substring(0, 4);
-            if (firstFour >= '4000' && firstFour <= '4199') return 'CLASSIC';
-            if (firstFour >= '4200' && firstFour <= '4399') return 'GOLD';
-            if (firstFour >= '4400' && firstFour <= '4599') return 'PLATINUM';
-            return 'STANDARD';
-        }
-
-        function getIssuerBank(bin) {
-            const banks = {
-                '411111': 'VISA TEST BANK',
-                '424242': 'STRIPE TEST BANK',
-                '454545': 'MASTERCARD TEST BANK',
-                '555555': 'MASTERCARD TEST BANK',
-                '378282': 'AMERICAN EXPRESS',
-                '443040': 'CAPITAL ONE',
-                '414720': 'CHASE BANK',
-                '476173': 'WELLS FARGO',
-                '533875': 'CITIBANK'
-            };
-            for (let prefix in banks) {
-                if (bin.startsWith(prefix)) return banks[prefix];
-            }
-            return 'ISSUING BANK';
-        }
-
-        function luhnCheck(cardNumber) {
-            const digits = cardNumber.replace(/\D/g, '').split('').map(Number);
-            let sum = 0;
-            let isEven = false;
-            for (let i = digits.length - 1; i >= 0; i--) {
-                let digit = digits[i];
-                if (isEven) {
-                    digit *= 2;
-                    if (digit > 9) digit -= 9;
-                }
-                sum += digit;
-                isEven = !isEven;
-            }
-            return sum % 10 === 0;
-        }
-
-        function displayResults(data, cardNumber) {
-            const resultContent = document.getElementById('resultContent');
-            const luhnValid = luhnCheck(cardNumber);
-            const masked = cardNumber.substring(0, 6) + '••••••' + cardNumber.slice(-4);
-
-            resultContent.innerHTML = `
-                <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${data.bank.name}</span></div>
-                <div class="result-item"><span class="result-label">🎴 SCHEME:</span><span class="result-value">${data.scheme}</span></div>
-                <div class="result-item"><span class="result-label">💳 TYPE:</span><span class="result-value">${data.type}</span></div>
-                <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${data.level}</span></div>
-                <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${data.country.name}</span></div>
-                <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${cardNumber.substring(0,6)}</span></div>
-                <div class="result-item"><span class="result-label">🎯 MASKED:</span><span class="result-value">${masked}</span></div>
-                <div class="result-item"><span class="result-label">✅ LUHN:</span><span class="result-value" style="color:${luhnValid?'#00ff88':'#ff0088'};">${luhnValid?'VALID ✅':'INVALID ❌'}</span></div>
-            `;
-            document.getElementById('results').classList.add('show');
-        }
+            },
+            hidePostalCode: true
+        });
+        cardElement.mount('#card-element');
 
         function showError(msg) {
             document.getElementById('resultContent').innerHTML = `<div class="error">🚨 ${msg}</div>`;
             document.getElementById('results').classList.add('show');
         }
 
-        // Initialize
-        createStars();
+        async function analyzeCard() {
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Scanning cosmic signature...</div>`;
+            document.getElementById('results').classList.add('show');
+
+            try {
+                const { paymentMethod, error } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                    billing_details: { name: 'Cosmic User' }
+                });
+
+                if (error) throw error;
+
+                const card = paymentMethod.card;
+                resultContent.innerHTML = `
+                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${card.brand.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">💰 FUNDING:</span><span class="result-value">${card.funding.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${getBankFromBrand(card.brand)}</span></div>
+                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${card.country}</span></div>
+                    <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${card.exp_month}/${card.exp_year}</span></div>
+                    <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${card.last4}</span></div>
+                    <div class="result-item"><span class="result-label">✅ VALID:</span><span class="result-value" style="color:#00ff88;">YES ✅</span></div>
+                    <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
+                        ✅ Card is valid and ready for testing.
+                    </div>
+                `;
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        async function testCardTransaction() {
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 test transaction...</div>`;
+            document.getElementById('results').classList.add('show');
+
+            try {
+                const response = await fetch('/api/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: 50 })
+                });
+                const { clientSecret } = await response.json();
+
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: { name: 'Cosmic Test User' }
+                    }
+                });
+
+                if (error) throw error;
+
+                if (paymentIntent.status === 'succeeded') {
+                    resultContent.innerHTML = `
+                        <div style="text-align:center;color:#00ff88;">
+                            ✅ SUCCESS!<br><br>
+                            <strong>$0.50 TEST TRANSACTION COMPLETED</strong><br>
+                            ID: ${paymentIntent.id}<br>Status: ${paymentIntent.status}
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Payment failed');
+                }
+            } catch (err) {
+                resultContent.innerHTML = `<div class="error">❌ Failed: ${err.message}</div>`;
+            }
+        }
+
+        function getBankFromBrand(brand) {
+            const banks = {
+                visa: 'VISA ISSUING BANK',
+                mastercard: 'MASTERCARD NETWORK BANK',
+                amex: 'AMERICAN EXPRESS SERVICES LLC',
+                discover: 'DISCOVER BANK'
+            };
+            return banks[brand] || 'ISSUING BANK';
+        }
+
+        // Create stars
+        document.querySelector('.stars').innerHTML = Array(100).fill().map(() => {
+            const s = document.createElement('div');
+            s.classList.add('star');
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.width = s.style.height = Math.random() * 3 + 1 + 'px';
+            return s.outerHTML;
+        }).join('');
     </script>
 </body>
 </html>
