@@ -230,7 +230,7 @@
     <div class="container">
         <div class="header">
             <h1 class="title">COSMIC CARD ANALYZER</h1>
-            <p class="subtitle">🚀 Secure Transactions via Vercel & Stripe</p>
+            <p class="subtitle">🚀 Live Mode: Connected to Stripe</p>
         </div>
         <div class="card-form">
             <div class="input-group">
@@ -241,7 +241,7 @@
                 🔍 ANALYZE CARD
             </button>
             <button class="btn test-btn" onclick="runTestTransaction()">
-                💸 RUN $0.50 TEST TRANSACTION
+                💸 PROCESS $0.50 TRANSACTION
             </button>
         </div>
         <div id="results" class="results">
@@ -252,7 +252,7 @@
 
     <script>
         // Replace with your Stripe publishable key
-        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
+        const stripe = Stripe('pk_live_YOUR_REAL_KEY'); // Will be replaced in Vercel
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
             style: {
@@ -293,7 +293,7 @@
                     <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${card.exp_month}/${card.exp_year}</span></div>
                     <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${card.last4}</span></div>
                     <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        ✅ Card is valid and ready for testing.
+                        ✅ Card is valid and ready for processing.
                     </div>
                 `;
             } catch (err) {
@@ -303,7 +303,7 @@
 
         async function runTestTransaction() {
             const resultContent = document.getElementById('resultContent');
-            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 test transaction...</div>`;
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 transaction...</div>`;
             document.getElementById('results').classList.add('show');
 
             try {
@@ -327,7 +327,7 @@
                     resultContent.innerHTML = `
                         <div style="text-align:center;color:#00ff88;">
                             ✅ SUCCESS!<br><br>
-                            <strong>$0.50 TEST TRANSACTION COMPLETED</strong><br>
+                            <strong>$0.50 TRANSACTION COMPLETED</strong><br>
                             ID: ${paymentIntent.id}<br>Status: ${paymentIntent.status}
                         </div>
                     `;
