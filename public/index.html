@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmic Card Analyzer</title>
+    <!-- Load Stripe.js -->
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -20,6 +21,7 @@
             overflow-x: hidden;
             position: relative;
         }
+        /* Animated stars */
         .stars {
             position: fixed;
             top: 0;
@@ -41,6 +43,7 @@
             0% { opacity: 0.3; transform: scale(0.8); }
             100% { opacity: 1; transform: scale(1.2); }
         }
+        /* Floating alien */
         .alien {
             position: fixed;
             right: 10%;
@@ -54,6 +57,7 @@
             0%, 100% { transform: translateY(0px) rotate(-5deg); }
             50% { transform: translateY(-30px) rotate(5deg); }
         }
+        /* UFO */
         .ufo {
             position: fixed;
             left: 5%;
@@ -111,7 +115,7 @@
             box-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
         }
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .input-label {
             display: block;
@@ -120,14 +124,16 @@
             color: #00ff88;
             text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
-        .card-element {
+        #card-element {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.2em;
+            font-family: 'Orbitron', monospace;
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #00ff88;
             border-radius: 10px;
-            padding: 15px 20px;
-            font-family: 'Orbitron', monospace;
             color: #00ff88;
-            font-size: 1.2em;
+            outline: none;
         }
         .btn {
             width: 100%;
@@ -232,14 +238,14 @@
         </div>
         <div class="card-form">
             <div class="input-group">
-                <label class="input-label">Enter Card Details:</label>
-                <div id="card-element" class="card-element"></div>
+                <label class="input-label">Enter Card:</label>
+                <div id="card-element"></div>
             </div>
             <button class="btn analyze-btn" onclick="analyzeCard()">
-                🔍 ANALYZE CARD
+                🔍 ANALYZE CARD INFO
             </button>
-            <button class="btn test-btn" onclick="testCardTransaction()">
-                💸 TEST $0.50 TRANSACTION
+            <button class="btn test-btn" onclick="testTransaction()">
+                💳 TEST $0.50 TRANSACTION
             </button>
         </div>
         <div id="results" class="results">
@@ -250,7 +256,7 @@
 
     <script>
         // Replace with your Stripe publishable key
-        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
+        const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO'); // Will be replaced in Vercel
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
             style: {
@@ -260,8 +266,7 @@
                     color: '#00ff88',
                     '::placeholder': { color: '#00ccff' }
                 }
-            },
-            hidePostalCode: true
+            }
         });
         cardElement.mount('#card-element');
 
@@ -285,16 +290,29 @@
                 if (error) throw error;
 
                 const card = paymentMethod.card;
+                const bin = card.number.substring(0, 6);
+
+                const localData = {
+                    bank: getIssuerBank(bin),
+                    scheme: card.brand.toUpperCase(),
+                    type: card.funding.toUpperCase(),
+                    level: getCardLevel(bin),
+                    country: card.country,
+                    currency: 'USD',
+                    bin: bin,
+                    masked: `${bin}••••••${card.last4}`
+                };
+
                 resultContent.innerHTML = `
-                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${card.brand.toUpperCase()}</span></div>
-                    <div class="result-item"><span class="result-label">💰 FUNDING:</span><span class="result-value">${card.funding.toUpperCase()}</span></div>
-                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${getBankFromBrand(card.brand)}</span></div>
-                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${card.country}</span></div>
-                    <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${card.exp_month}/${card.exp_year}</span></div>
-                    <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${card.last4}</span></div>
-                    <div class="result-item"><span class="result-label">✅ VALID:</span><span class="result-value" style="color:#00ff88;">YES ✅</span></div>
+                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${localData.bank}</span></div>
+                    <div class="result-item"><span class="result-label">🎴 SCHEME:</span><span class="result-value">${localData.scheme}</span></div>
+                    <div class="result-item"><span class="result-label">💳 TYPE:</span><span class="result-value">${localData.type}</span></div>
+                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${localData.level}</span></div>
+                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${localData.country}</span></div>
+                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${localData.bin}</span></div>
+                    <div class="result-item"><span class="result-label">🎯 MASKED:</span><span class="result-value">${localData.masked}</span></div>
                     <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        ✅ Card is valid and ready for testing.
+                        ✅ Card info retrieved. No transaction attempted.
                     </div>
                 `;
             } catch (err) {
@@ -302,9 +320,9 @@
             }
         }
 
-        async function testCardTransaction() {
+        async function testTransaction() {
             const resultContent = document.getElementById('resultContent');
-            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 test transaction...</div>`;
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 transaction...</div>`;
             document.getElementById('results').classList.add('show');
 
             try {
@@ -324,30 +342,53 @@
 
                 if (error) throw error;
 
-                if (paymentIntent.status === 'succeeded') {
-                    resultContent.innerHTML = `
-                        <div style="text-align:center;color:#00ff88;">
-                            ✅ SUCCESS!<br><br>
-                            <strong>$0.50 TEST TRANSACTION COMPLETED</strong><br>
-                            ID: ${paymentIntent.id}<br>Status: ${paymentIntent.status}
-                        </div>
-                    `;
-                } else {
-                    throw new Error('Payment failed');
-                }
+                const card = paymentIntent.charges.data[0].payment_method_details.card;
+
+                resultContent.innerHTML = `
+                    <div class="result-item"><span class="result-label">✅ STATUS:</span><span class="result-value" style="color:#00ff88;">ACTIVE ✅</span></div>
+                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${card.brand.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">💰 FUNDING:</span><span class="result-value">${card.funding.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${getIssuerBank(card.number.substring(0,6))}</span></div>
+                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${card.country}</span></div>
+                    <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${card.last4}</span></div>
+                    <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${card.exp_month}/${card.exp_year}</span></div>
+                    <div class="result-item"><span class="result-label">💸 AMOUNT:</span><span class="result-value">$0.50</span></div>
+                    <div class="result-item"><span class="result-label">🆔 ID:</span><span class="result-value" style="font-size:0.8em;">${paymentIntent.id}</span></div>
+                `;
             } catch (err) {
-                resultContent.innerHTML = `<div class="error">❌ Failed: ${err.message}</div>`;
+                resultContent.innerHTML = `
+                    <div class="result-item"><span class="result-label">❌ STATUS:</span><span class="result-value" style="color:#ff0088;">INACTIVE ❌</span></div>
+                    <div style="margin-top:10px;color:#ff0088;font-size:0.9em;text-align:center;">
+                        Failed: ${err.message}
+                    </div>
+                `;
             }
         }
 
-        function getBankFromBrand(brand) {
+        function getCardLevel(bin) {
+            const firstFour = bin.substring(0, 4);
+            if (firstFour >= '4000' && firstFour <= '4199') return 'CLASSIC';
+            if (firstFour >= '4200' && firstFour <= '4399') return 'GOLD';
+            if (firstFour >= '4400' && firstFour <= '4599') return 'PLATINUM';
+            return 'STANDARD';
+        }
+
+        function getIssuerBank(bin) {
             const banks = {
-                visa: 'VISA ISSUING BANK',
-                mastercard: 'MASTERCARD NETWORK BANK',
-                amex: 'AMERICAN EXPRESS SERVICES LLC',
-                discover: 'DISCOVER BANK'
+                '411111': 'VISA TEST BANK',
+                '424242': 'STRIPE TEST BANK',
+                '454545': 'MASTERCARD TEST BANK',
+                '555555': 'MASTERCARD TEST BANK',
+                '378282': 'AMERICAN EXPRESS',
+                '443040': 'CAPITAL ONE',
+                '414720': 'CHASE BANK',
+                '476173': 'WELLS FARGO',
+                '533875': 'CITIBANK'
             };
-            return banks[brand] || 'ISSUING BANK';
+            for (let prefix in banks) {
+                if (bin.startsWith(prefix)) return banks[prefix];
+            }
+            return 'ISSUING BANK';
         }
 
         // Create stars
