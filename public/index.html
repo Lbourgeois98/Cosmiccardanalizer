@@ -292,27 +292,37 @@
                 const card = paymentMethod.card;
                 const bin = card.number.substring(0, 6);
 
-                const localData = {
-                    bank: getIssuerBank(bin),
-                    scheme: card.brand.toUpperCase(),
-                    type: card.funding.toUpperCase(),
-                    level: getCardLevel(bin),
-                    country: card.country,
-                    currency: 'USD',
+                // Fetch BIN data from backend
+                let binData = {};
+                try {
+                    const res = await fetch(`/api/bin/${bin}`);
+                    binData = await res.json();
+                } catch (e) {
+                    console.warn("BIN lookup failed:", e);
+                }
+
+                const enriched = {
+                    bank: binData.bank?.name || 'Unknown Bank',
+                    scheme: binData.scheme?.toUpperCase() || card.brand.toUpperCase(),
+                    type: binData.type || card.funding.toUpperCase(),
+                    level: binData.brand || 'Standard',
+                    country: binData.country?.name || card.country,
+                    currency: binData.country?.currency || 'USD',
                     bin: bin,
                     masked: `${bin}••••••${card.last4}`
                 };
 
                 resultContent.innerHTML = `
-                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${localData.bank}</span></div>
-                    <div class="result-item"><span class="result-label">🎴 SCHEME:</span><span class="result-value">${localData.scheme}</span></div>
-                    <div class="result-item"><span class="result-label">💳 TYPE:</span><span class="result-value">${localData.type}</span></div>
-                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${localData.level}</span></div>
-                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${localData.country}</span></div>
-                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${localData.bin}</span></div>
-                    <div class="result-item"><span class="result-label">🎯 MASKED:</span><span class="result-value">${localData.masked}</span></div>
+                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${enriched.bank}</span></div>
+                    <div class="result-item"><span class="result-label">🎴 SCHEME:</span><span class="result-value">${enriched.scheme}</span></div>
+                    <div class="result-item"><span class="result-label">💳 TYPE:</span><span class="result-value">${enriched.type}</span></div>
+                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${enriched.level}</span></div>
+                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${enriched.country}</span></div>
+                    <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${enriched.currency}</span></div>
+                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${enriched.bin}</span></div>
+                    <div class="result-item"><span class="result-label">🎯 MASKED:</span><span class="result-value">${enriched.masked}</span></div>
                     <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        ✅ Card info retrieved. No transaction attempted.
+                        ✅ Card info retrieved via secure BIN lookup.
                     </div>
                 `;
             } catch (err) {
@@ -348,7 +358,7 @@
                     <div class="result-item"><span class="result-label">✅ STATUS:</span><span class="result-value" style="color:#00ff88;">ACTIVE ✅</span></div>
                     <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${card.brand.toUpperCase()}</span></div>
                     <div class="result-item"><span class="result-label">💰 FUNDING:</span><span class="result-value">${card.funding.toUpperCase()}</span></div>
-                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${getIssuerBank(card.number.substring(0,6))}</span></div>
+                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${await getBankFromBin(card.number.substring(0,6))}</span></div>
                     <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${card.country}</span></div>
                     <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${card.last4}</span></div>
                     <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${card.exp_month}/${card.exp_year}</span></div>
@@ -365,30 +375,14 @@
             }
         }
 
-        function getCardLevel(bin) {
-            const firstFour = bin.substring(0, 4);
-            if (firstFour >= '4000' && firstFour <= '4199') return 'CLASSIC';
-            if (firstFour >= '4200' && firstFour <= '4399') return 'GOLD';
-            if (firstFour >= '4400' && firstFour <= '4599') return 'PLATINUM';
-            return 'STANDARD';
-        }
-
-        function getIssuerBank(bin) {
-            const banks = {
-                '411111': 'VISA TEST BANK',
-                '424242': 'STRIPE TEST BANK',
-                '454545': 'MASTERCARD TEST BANK',
-                '555555': 'MASTERCARD TEST BANK',
-                '378282': 'AMERICAN EXPRESS',
-                '443040': 'CAPITAL ONE',
-                '414720': 'CHASE BANK',
-                '476173': 'WELLS FARGO',
-                '533875': 'CITIBANK'
-            };
-            for (let prefix in banks) {
-                if (bin.startsWith(prefix)) return banks[prefix];
+        async function getBankFromBin(bin) {
+            try {
+                const res = await fetch(`/api/bin/${bin}`);
+                const data = await res.json();
+                return data.bank?.name || 'Unknown Bank';
+            } catch (e) {
+                return 'Unknown Bank';
             }
-            return 'ISSUING BANK';
         }
 
         // Create stars
