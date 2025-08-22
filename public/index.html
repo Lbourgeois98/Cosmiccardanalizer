@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmic Card Analyzer</title>
-    <!-- Load Stripe.js only for transaction -->
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -54,17 +53,48 @@
             50% { transform: translateX(0px) translateY(-10px); }
             75% { transform: translateX(-10px) translateY(-5px); }
         }
+
+        /* Navigation */
+        .nav-container {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
+        }
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            padding: 12px 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1em;
+            border: 2px solid #00ff88;
+            border-radius: 25px;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
             z-index: 3;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-top: 40px;
         }
         .title {
             font-size: 3em;
@@ -76,15 +106,24 @@
             text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
             margin-bottom: 10px;
             animation: glow 2s ease-in-out infinite alternate;
+            text-align: center;
         }
         @keyframes glow {
             from { filter: drop-shadow(0 0 20px #00ff88); }
             to { filter: drop-shadow(0 0 40px #00ccff); }
         }
-        .subtitle {
-            font-size: 1.2em;
-            color: #00ccff;
-            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+
+        /* Page Sections */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .section {
@@ -112,7 +151,7 @@
             color: #00ff88;
             text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
         }
-        input[type="text"], input[type="number"] {
+        input[type="text"], input[type="number"], textarea {
             width: 100%;
             padding: 15px;
             font-size: 1.2em;
@@ -122,6 +161,10 @@
             border-radius: 10px;
             color: #00ff88;
             outline: none;
+            resize: vertical;
+        }
+        textarea {
+            min-height: 120px;
         }
         .btn {
             width: 100%;
@@ -143,6 +186,10 @@
         }
         .test-btn {
             background: linear-gradient(45deg, #00ccff, #ff0088);
+            color: white;
+        }
+        .entry-btn {
+            background: linear-gradient(45deg, #ff0088, #00ff88);
             color: white;
         }
         .btn:hover {
@@ -213,6 +260,69 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Data Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        .data-table th {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ccff;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .data-table td {
+            color: #00ff88;
+        }
+        .data-table tr:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+        .delete-btn {
+            background: #ff0088;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-family: 'Orbitron', monospace;
+        }
+        .delete-btn:hover {
+            background: #cc0066;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .controls button {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .controls button:hover {
+            background: rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -220,70 +330,227 @@
     <div class="alien">👽</div>
     <div class="ufo">🛸</div>
 
-    <div class="container">
-        <!-- ANALYZE CARD SECTION (Plain Input, No Stripe) -->
-        <div class="section">
-            <h2>🔍 Analyze Card Info</h2>
-            <div class="input-group">
-                <label class="input-label">Card Number (First 6 Digits)</label>
-                <input type="text" id="bin-input" placeholder="Enter first 6 digits" maxlength="6" inputmode="numeric">
-            </div>
-            <button class="btn analyze-btn" onclick="analyzeCard()">🔍 ANALYZE CARD INFO</button>
-        </div>
-
-        <!-- TEST TRANSACTION SECTION (Uses Stripe) -->
-        <div class="section">
-            <h2>💳 Test $0.50 Transaction</h2>
-            <div class="input-group">
-                <label class="input-label">Enter Full Card</label>
-                <div id="card-element"></div>
-            </div>
-            <button class="btn test-btn" onclick="testTransaction()">💳 TEST $0.50 TRANSACTION</button>
-        </div>
-
-        <!-- RESULTS -->
-        <div id="results" class="results">
-            <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">🔍 ANALYSIS RESULTS</h2>
-            <div id="resultContent"></div>
+    <div class="nav-container">
+        <h1 class="title">COSMIC CARD ANALYZER</h1>
+        <div class="nav-menu">
+            <button class="nav-btn active" onclick="showPage('analyzer')">🔍 Card Analyzer</button>
+            <button class="nav-btn" onclick="showPage('tester')">💳 Card Tester</button>
+            <button class="nav-btn" onclick="showPage('manager')">📊 Entry Manager</button>
         </div>
     </div>
 
+    <div class="container">
+        <!-- CARD ANALYZER PAGE -->
+        <div id="analyzer" class="page active">
+            <div class="section">
+                <h2>🔍 Analyze Card Info</h2>
+                <div class="input-group">
+                    <label class="input-label">Card Number (First 6 Digits)</label>
+                    <input type="text" id="bin-input" placeholder="Enter first 6 digits" maxlength="6" inputmode="numeric">
+                </div>
+                <button class="btn analyze-btn" onclick="analyzeCard()">🔍 ANALYZE CARD INFO</button>
+            </div>
+
+            <div id="analyzer-results" class="results">
+                <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">🔍 ANALYSIS RESULTS</h2>
+                <div id="analyzerResultContent"></div>
+            </div>
+        </div>
+
+        <!-- CARD TESTER PAGE -->
+        <div id="tester" class="page">
+            <div class="section">
+                <h2>💳 Test $0.50 Transaction</h2>
+                <div class="input-group">
+                    <label class="input-label">Enter Full Card</label>
+                    <div id="card-element"></div>
+                </div>
+                <button class="btn test-btn" onclick="testTransaction()">💳 TEST $0.50 TRANSACTION</button>
+            </div>
+
+            <div id="tester-results" class="results">
+                <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">💳 TRANSACTION RESULTS</h2>
+                <div id="testerResultContent"></div>
+            </div>
+        </div>
+
+        <!-- ENTRY MANAGER PAGE -->
+        <div id="manager" class="page">
+            <div class="section">
+                <h2>📊 Entry Manager</h2>
+                
+                <!-- Connection Status -->
+                <div id="connection-status" style="text-align: center; margin-bottom: 15px; padding: 10px; background: rgba(0, 255, 136, 0.1); border-radius: 10px; font-size: 0.9em;">
+                    🔄 Initializing database connection...
+                </div>
+                
+                <div class="controls">
+                    <button onclick="showAddForm()">➕ Add Entry</button>
+                    <button onclick="showBulkForm()">📋 Bulk Add</button>
+                    <button onclick="clearAllEntries()">🗑️ Clear All</button>
+                    <button onclick="exportData()">💾 Export</button>
+                    <button onclick="refreshData()">🔄 Refresh</button>
+                </div>
+
+                <!-- Add Single Entry Form -->
+                <div id="add-form" style="display: none;">
+                    <div class="input-group">
+                        <label class="input-label">Card Number</label>
+                        <input type="text" id="card-number" placeholder="Card number">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Expiry (MM/YY)</label>
+                        <input type="text" id="expiry" placeholder="MM/YY">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">CVV</label>
+                        <input type="text" id="cvv" placeholder="CVV">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">ZIP Code</label>
+                        <input type="text" id="zip" placeholder="ZIP Code">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Status</label>
+                        <input type="text" id="status" placeholder="Live/Dead/Unknown" value="Unknown">
+                    </div>
+                    <button class="btn entry-btn" onclick="addSingleEntry()">➕ ADD ENTRY</button>
+                </div>
+
+                <!-- Bulk Add Form -->
+                <div id="bulk-form" style="display: none;">
+                    <div class="input-group">
+                        <label class="input-label">Paste Card Data (Auto-organizes format)</label>
+                        <textarea id="bulk-data" placeholder="Paste cards here. Supports formats like:
+4111111111111111|12|25|123|12345
+4111-1111-1111-1111 12/25 123 12345
+4111 1111 1111 1111|12/25|123|12345"></textarea>
+                    </div>
+                    <button class="btn entry-btn" onclick="addBulkEntries()">📋 PROCESS BULK DATA</button>
+                </div>
+
+                <!-- Data Table -->
+                <table class="data-table" id="entries-table">
+                    <thead>
+                        <tr>
+                            <th>Card Number</th>
+                            <th>Expiry</th>
+                            <th>CVV</th>
+                            <th>ZIP</th>
+                            <th>Status</th>
+                            <th>Added</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entries-tbody">
+                        <!-- Entries will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCSJKowHoQuzGXI6K78ajoo_esTDnV0Sw",
+            authDomain: "cosmic-card-analyzer.firebaseapp.com",
+            projectId: "cosmic-card-analyzer",
+            storageBucket: "cosmic-card-analyzer.firebasestorage.app",
+            messagingSenderId: "639144649613",
+            appId: "1:639144649613:web:4ddb7b556f12f89579d3c4",
+            measurementId: "G-QYWLSCYK5K"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebaseDB = db;
+        window.firebaseUtils = {
+            collection,
+            addDoc,
+            getDocs,
+            deleteDoc,
+            doc,
+            onSnapshot,
+            query,
+            orderBy,
+            serverTimestamp
+        };
+
+        console.log("🔥 Firebase initialized successfully");
+        
+        // Initialize app after Firebase is ready
+        if (window.initApp) {
+            window.initApp();
+        }
+    </script>
+
     <script>
-        // =============== ANALYZE CARD (No Stripe) ===============
+        // Global variables
+        let entries = [];
+        let isFirebaseConnected = false;
+
+        // Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // =============== CARD ANALYZER (Using binx.cc) ===============
         async function analyzeCard() {
-            const resultContent = document.getElementById('resultContent');
+            const resultContent = document.getElementById('analyzerResultContent');
             const binInput = document.getElementById('bin-input').value.replace(/\D/g, '');
 
             if (binInput.length < 6) {
                 resultContent.innerHTML = `<div class="error">🚨 Please enter at least 6 digits</div>`;
-                document.getElementById('results').classList.add('show');
+                document.getElementById('analyzer-results').classList.add('show');
                 return;
             }
 
             const bin = binInput.slice(0, 6);
             resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Looking up BIN info...</div>`;
-            document.getElementById('results').classList.add('show');
+            document.getElementById('analyzer-results').classList.add('show');
 
             try {
-                const res = await fetch(`/api/bin/${bin}`);
+                const res = await fetch(`https://binx.cc/api/${bin}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Cosmic-Card-Analyzer'
+                    }
+                });
+                
+                if (!res.ok) throw new Error('BIN lookup failed');
+                
                 const data = await res.json();
 
-                const brand = data.brand || 'Unknown';
-                const bank = data.issuer || 'Unknown Bank';
-                const country = data.country?.name || 'Unknown';
-                const currency = data.country?.currency || 'USD';
-                const level = data.level || 'Unknown';
-                const cardType = data.cardType || 'Unknown';
+                const brand = data.brand || data.scheme || 'Unknown';
+                const bank = data.bank || data.issuer || 'Unknown Bank';
+                const country = data.country || 'Unknown';
+                const currency = data.currency || 'USD';
+                const level = data.level || data.type || 'Unknown';
+                const cardType = data.cardType || (data.prepaid ? 'Prepaid' : 'Credit/Debit');
 
                 resultContent.innerHTML = `
                     <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${bin}</span></div>
-                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${brand}</span></div>
+                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${brand.toUpperCase()}</span></div>
                     <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${bank}</span></div>
                     <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${country}</span></div>
                     <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${currency}</span></div>
-                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level}</span></div>
-                    <div class="result-item"><span class="result-label">🔍 TYPE:</span><span class="result-value">${cardType}</span></div>
+                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">🔍 TYPE:</span><span class="result-value">${cardType.toUpperCase()}</span></div>
                     <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
+                        Data provided by binx.cc
                     </div>
                 `;
             } catch (err) {
@@ -291,8 +558,7 @@
             }
         }
 
-        // =============== TEST TRANSACTION (Uses Stripe) ===============
-        // Replace with your publishable key
+        // =============== CARD TESTER (Stripe) ===============
         const stripe = Stripe('pk_live_51RyFQw3xHLWv8lmEAOHH59LVElWtham2vZdh5onQjjgthirQRut6PmKzSCYxc0w0upWSbzKJyLFJ9bdmnG122siA00D0Nnt7hO');
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
@@ -305,12 +571,18 @@
                 }
             }
         });
-        cardElement.mount('#card-element');
+        
+        // Mount card element when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('card-element')) {
+                cardElement.mount('#card-element');
+            }
+        });
 
         async function testTransaction() {
-            const resultContent = document.getElementById('resultContent');
+            const resultContent = document.getElementById('testerResultContent');
             resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Processing $0.50 transaction...</div>`;
-            document.getElementById('results').classList.add('show');
+            document.getElementById('tester-results').classList.add('show');
 
             try {
                 const response = await fetch('/api/create-payment-intent', {
@@ -334,7 +606,6 @@
                         <div class="result-item"><span class="result-label">✅ CARD VALID:</span><span class="result-value" style="color:#00ff88;">YES ✅</span></div>
                         <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${paymentIntent.payment_method_details.card.brand.toUpperCase()}</span></div>
                         <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${paymentIntent.payment_method_details.card.last4}</span></div>
-                        <div class="result-item"><span class="result-label">📆 EXPIRES:</span><span class="result-value">${paymentIntent.payment_method_details.card_expiry_month}/${paymentIntent.payment_method_details.card_expiry_year}</span></div>
                         <div class="result-item"><span class="result-label">💸 AMOUNT:</span><span class="result-value">$0.50</span></div>
                         <div class="result-item"><span class="result-label">🆔 ID:</span><span class="result-value" style="font-size:0.8em;">${paymentIntent.id}</span></div>
                         <div style="margin-top:20px;color:#00ccff;text-align:center;">
@@ -349,15 +620,393 @@
             }
         }
 
-        // Create stars
-        document.querySelector('.stars').innerHTML = Array(100).fill().map(() => {
-            const s = document.createElement('div');
-            s.classList.add('star');
-            s.style.left = Math.random() * 100 + '%';
-            s.style.top = Math.random() * 100 + '%';
-            s.style.width = s.style.height = Math.random() * 3 + 1 + 'px';
-            return s.outerHTML;
-        }).join('');
+        // =============== ENTRY MANAGER ===============
+        
+        // Initialize Firebase connection
+        async function initializeFirebase() {
+            updateConnectionStatus('🔄 Connecting to Firebase...');
+            
+            try {
+                if (window.firebaseDB && window.firebaseUtils) {
+                    isFirebaseConnected = true;
+                    console.log('🔥 Firebase connected successfully');
+                    await loadEntriesFromFirebase();
+                    setupRealtimeListener();
+                } else {
+                    throw new Error('Firebase not available');
+                }
+            } catch (error) {
+                console.error('Firebase connection failed:', error);
+                isFirebaseConnected = false;
+                loadEntriesFromLocal();
+            }
+        }
+
+        // Load entries from Firebase
+        async function loadEntriesFromFirebase() {
+            try {
+                updateConnectionStatus('🔄 Loading data from Firebase...');
+                
+                const q = window.firebaseUtils.query(
+                    window.firebaseUtils.collection(window.firebaseDB, 'cardEntries'),
+                    window.firebaseUtils.orderBy('timestamp', 'desc')
+                );
+                
+                const querySnapshot = await window.firebaseUtils.getDocs(q);
+                entries = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    entries.push({
+                        id: doc.id,
+                        ...data,
+                        added: data.added || (data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : new Date().toLocaleString())
+                    });
+                });
+                
+                renderEntries();
+                updateConnectionStatus(`🔥 Firebase connected - ${entries.length} entries loaded`);
+            } catch (error) {
+                console.error('Error loading from Firebase:', error);
+                updateConnectionStatus('❌ Firebase error - Using local storage');
+                isFirebaseConnected = false;
+                loadEntriesFromLocal();
+            }
+        }
+
+        // Setup real-time listener
+        function setupRealtimeListener() {
+            try {
+                const q = window.firebaseUtils.query(
+                    window.firebaseUtils.collection(window.firebaseDB, 'cardEntries'),
+                    window.firebaseUtils.orderBy('timestamp', 'desc')
+                );
+                
+                window.firebaseUtils.onSnapshot(q, (snapshot) => {
+                    entries = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        entries.push({
+                            id: doc.id,
+                            ...data,
+                            added: data.added || (data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : new Date().toLocaleString())
+                        });
+                    });
+                    renderEntries();
+                    updateConnectionStatus(`🔥 Firebase real-time active - ${entries.length} entries`);
+                });
+            } catch (error) {
+                console.error('Real-time listener error:', error);
+            }
+        }
+
+        // Load from localStorage (fallback)
+        function loadEntriesFromLocal() {
+            entries = JSON.parse(localStorage.getItem('cosmicEntries') || '[]');
+            renderEntries();
+            updateConnectionStatus('📱 Using local storage - Data saved locally only');
+        }
+
+        // Save entry to Firebase or localStorage
+        async function saveEntry(entryData) {
+            if (isFirebaseConnected) {
+                try {
+                    await window.firebaseUtils.addDoc(
+                        window.firebaseUtils.collection(window.firebaseDB, 'cardEntries'),
+                        {
+                            ...entryData,
+                            timestamp: window.firebaseUtils.serverTimestamp(),
+                            added: new Date().toLocaleString()
+                        }
+                    );
+                    return true;
+                } catch (error) {
+                    console.error('Error saving to Firebase:', error);
+                    saveToLocal(entryData);
+                    return false;
+                }
+            } else {
+                saveToLocal(entryData);
+                return true;
+            }
+        }
+
+        function saveToLocal(entryData) {
+            const entry = {
+                ...entryData,
+                id: Date.now() + Math.random(),
+                added: new Date().toLocaleString()
+            };
+            entries.push(entry);
+            localStorage.setItem('cosmicEntries', JSON.stringify(entries));
+            renderEntries();
+        }
+
+        // Delete entry
+        async function deleteEntry(id) {
+            if (!confirm('Delete this entry?')) return;
+
+            if (isFirebaseConnected) {
+                try {
+                    await window.firebaseUtils.deleteDoc(
+                        window.firebaseUtils.doc(window.firebaseDB, 'cardEntries', id)
+                    );
+                } catch (error) {
+                    console.error('Error deleting from Firebase:', error);
+                    alert('Failed to delete from database');
+                }
+            } else {
+                entries = entries.filter(entry => entry.id !== id);
+                localStorage.setItem('cosmicEntries', JSON.stringify(entries));
+                renderEntries();
+            }
+        }
+
+        // Clear all entries
+        async function clearAllEntries() {
+            if (!confirm('Delete ALL entries? This cannot be undone.')) return;
+
+            if (isFirebaseConnected) {
+                try {
+                    const querySnapshot = await window.firebaseUtils.getDocs(
+                        window.firebaseUtils.collection(window.firebaseDB, 'cardEntries')
+                    );
+                    
+                    const deletePromises = querySnapshot.docs.map(doc => 
+                        window.firebaseUtils.deleteDoc(doc.ref)
+                    );
+                    
+                    await Promise.all(deletePromises);
+                    alert('All entries deleted from database');
+                } catch (error) {
+                    console.error('Error clearing Firebase:', error);
+                    alert('Failed to clear database');
+                }
+            } else {
+                entries = [];
+                localStorage.setItem('cosmicEntries', JSON.stringify(entries));
+                renderEntries();
+            }
+        }
+
+        // Update connection status
+        function updateConnectionStatus(message) {
+            const statusDiv = document.getElementById('connection-status');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.style.color = isFirebaseConnected ? '#00ff88' : '#00ccff';
+            }
+        }
+
+        // Form functions
+        function showAddForm() {
+            document.getElementById('add-form').style.display = 'block';
+            document.getElementById('bulk-form').style.display = 'none';
+        }
+
+        function showBulkForm() {
+            document.getElementById('bulk-form').style.display = 'block';
+            document.getElementById('add-form').style.display = 'none';
+        }
+
+        // Add single entry
+        async function addSingleEntry() {
+            const cardNumber = document.getElementById('card-number').value.trim();
+            const expiry = document.getElementById('expiry').value.trim();
+            const cvv = document.getElementById('cvv').value.trim();
+            const zip = document.getElementById('zip').value.trim();
+            const status = document.getElementById('status').value.trim() || 'Unknown';
+
+            if (!cardNumber) {
+                alert('Card number is required');
+                return;
+            }
+
+            const entryData = {
+                cardNumber: cardNumber.replace(/\s/g, ''),
+                expiry: expiry,
+                cvv: cvv,
+                zip: zip,
+                status: status
+            };
+
+            await saveEntry(entryData);
+
+            // Clear form
+            document.getElementById('card-number').value = '';
+            document.getElementById('expiry').value = '';
+            document.getElementById('cvv').value = '';
+            document.getElementById('zip').value = '';
+            document.getElementById('status').value = 'Unknown';
+        }
+
+        // Add bulk entries
+        async function addBulkEntries() {
+            const bulkData = document.getElementById('bulk-data').value.trim();
+            if (!bulkData) return;
+
+            const lines = bulkData.split('\n').filter(line => line.trim());
+            let addedCount = 0;
+
+            for (const line of lines) {
+                const parsed = parseCardLine(line.trim());
+                if (parsed.cardNumber) {
+                    const entryData = {
+                        cardNumber: parsed.cardNumber,
+                        expiry: parsed.expiry || '',
+                        cvv: parsed.cvv || '',
+                        zip: parsed.zip || '',
+                        status: 'Unknown'
+                    };
+                    
+                    await saveEntry(entryData);
+                    addedCount++;
+                }
+            }
+
+            document.getElementById('bulk-data').value = '';
+            alert(`Added ${addedCount} entries`);
+        }
+
+        // Parse card line for different formats
+        function parseCardLine(line) {
+            line = line.replace(/\s+/g, ' ').trim();
+            
+            const patterns = [
+                /^(\d{13,19})\|(\d{1,2})\|(\d{2,4})\|(\d{3,4})\|(\d{5})$/,
+                /^(\d{13,19})\|(\d{1,2}\/\d{2,4})\|(\d{3,4})\|(\d{5})$/,
+                /^([\d\s\-]{13,25})\s+(\d{1,2}\/\d{2,4})\s+(\d{3,4})\s+(\d{5})$/,
+                /^(\d{13,19})\s+(\d{1,2})\s+(\d{2,4})\s+(\d{3,4})\s+(\d{5})$/,
+                /^(\d{13,19})$/
+            ];
+
+            for (let pattern of patterns) {
+                const match = line.match(pattern);
+                if (match) {
+                    let cardNumber = match[1].replace(/[\s\-]/g, '');
+                    let expiry = match[2] || '';
+                    let cvv = match[3] || '';
+                    let zip = match[4] || match[5] || '';
+
+                    if (expiry && !expiry.includes('/')) {
+                        if (match[3] && match[3].length <= 2) {
+                            expiry = match[2] + '/' + match[3];
+                            cvv = match[4] || '';
+                            zip = match[5] || '';
+                        }
+                    }
+
+                    return { cardNumber, expiry, cvv, zip };
+                }
+            }
+
+            return { cardNumber: null };
+        }
+
+        // Refresh data
+        async function refreshData() {
+            if (isFirebaseConnected) {
+                await loadEntriesFromFirebase();
+            } else {
+                loadEntriesFromLocal();
+            }
+        }
+
+        // Export data
+        function exportData() {
+            const csv = 'Card Number,Expiry,CVV,ZIP,Status,Added\n' + 
+                       entries.map(e => `${e.cardNumber},${e.expiry},${e.cvv},${e.zip},${e.status},${e.added}`).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cosmic-entries.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Render entries table
+        function renderEntries() {
+            const tbody = document.getElementById('entries-tbody');
+            tbody.innerHTML = '';
+
+            if (entries.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #00ccff; padding: 30px;">
+                            📭 No entries yet. Add some cards to get started!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            entries.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${maskCardNumber(entry.cardNumber)}</td>
+                    <td>${entry.expiry}</td>
+                    <td>${entry.cvv}</td>
+                    <td>${entry.zip}</td>
+                    <td style="color: ${getStatusColor(entry.status)}">${entry.status}</td>
+                    <td style="font-size: 0.8em;">${entry.added}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteEntry('${entry.id}')">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Mask card number for security
+        function maskCardNumber(cardNumber) {
+            if (!cardNumber) return '';
+            if (cardNumber.length < 8) return cardNumber;
+            return cardNumber.slice(0, 4) + '****' + cardNumber.slice(-4);
+        }
+
+        // Get status color
+        function getStatusColor(status) {
+            switch (status.toLowerCase()) {
+                case 'live': return '#00ff88';
+                case 'dead': return '#ff0088';
+                case 'unknown': return '#00ccff';
+                default: return '#ffffff';
+            }
+        }
+
+        // Create stars animation
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Initialize app
+        window.initApp = function() {
+            console.log('🚀 Initializing Cosmic Card Analyzer...');
+            createStars();
+            initializeFirebase();
+            
+            // Mount Stripe card element
+            if (document.getElementById('card-element')) {
+                cardElement.mount('#card-element');
+            }
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.firebaseDB) {
+                window.initApp();
+            }
+        });
     </script>
 </body>
 </html>
