@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmic Card Analyzer</title>
+    <!-- Load Stripe.js only for transaction -->
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -41,12 +42,28 @@
             0% { opacity: 0.3; transform: scale(0.8); }
             100% { opacity: 1; transform: scale(1.2); }
         }
-        .alien { font-size: 60px; position: fixed; right: 10%; top: 20%; z-index: 2; animation: float 6s ease-in-out infinite; filter: drop-shadow(0 0 20px #00ff88); }
+        .alien { 
+            font-size: 40px; 
+            position: fixed; 
+            right: 5%; 
+            top: 15%; 
+            z-index: 2; 
+            animation: float 6s ease-in-out infinite; 
+            filter: drop-shadow(0 0 20px #00ff88); 
+        }
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(-5deg); }
             50% { transform: translateY(-30px) rotate(5deg); }
         }
-        .ufo { font-size: 40px; position: fixed; left: 5%; bottom: 10%; z-index: 2; animation: hover 4s ease-in-out infinite; filter: drop-shadow(0 0 15px #00ccff); }
+        .ufo { 
+            font-size: 30px; 
+            position: fixed; 
+            left: 3%; 
+            bottom: 5%; 
+            z-index: 2; 
+            animation: hover 4s ease-in-out infinite; 
+            filter: drop-shadow(0 0 15px #00ccff); 
+        }
         @keyframes hover {
             0%, 100% { transform: translateX(0px) translateY(0px); }
             25% { transform: translateX(10px) translateY(-5px); }
@@ -58,23 +75,43 @@
         .nav-container {
             position: relative;
             z-index: 10;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
         }
+        .title {
+            font-size: 2em;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ff88, #00ccff, #ff0088);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            margin-bottom: 15px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px #00ff88); }
+            to { filter: drop-shadow(0 0 40px #00ccff); }
+        }
+        
         .nav-menu {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 8px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
+            padding: 0 10px;
         }
         .nav-btn {
-            padding: 12px 25px;
+            flex: 1;
+            min-width: 100px;
+            max-width: 150px;
+            padding: 10px 8px;
             font-family: 'Orbitron', monospace;
             font-weight: 700;
-            font-size: 1em;
+            font-size: 0.8em;
             border: 2px solid #00ff88;
-            border-radius: 25px;
+            border-radius: 20px;
             background: rgba(0, 255, 136, 0.1);
             color: #00ff88;
             cursor: pointer;
@@ -90,27 +127,11 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px 15px;
             position: relative;
             z-index: 3;
-        }
-        .title {
-            font-size: 3em;
-            font-weight: 900;
-            background: linear-gradient(45deg, #00ff88, #00ccff, #ff0088);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
-            margin-bottom: 10px;
-            animation: glow 2s ease-in-out infinite alternate;
-            text-align: center;
-        }
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 20px #00ff88); }
-            to { filter: drop-shadow(0 0 40px #00ccff); }
         }
 
         /* Page Sections */
@@ -129,9 +150,9 @@
         .section {
             background: rgba(0, 255, 136, 0.1);
             border: 2px solid #00ff88;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
             backdrop-filter: blur(10px);
             box-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
         }
@@ -139,7 +160,7 @@
             color: #00ccff;
             margin-bottom: 15px;
             text-align: center;
-            font-size: 1.8em;
+            font-size: 1.3em;
         }
         .input-group {
             margin-bottom: 15px;
@@ -150,34 +171,35 @@
             font-weight: 700;
             color: #00ff88;
             text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+            font-size: 0.9em;
         }
         input[type="text"], input[type="number"], textarea {
             width: 100%;
-            padding: 15px;
-            font-size: 1.2em;
+            padding: 12px;
+            font-size: 1em;
             font-family: 'Orbitron', monospace;
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #00ff88;
-            border-radius: 10px;
+            border-radius: 8px;
             color: #00ff88;
             outline: none;
             resize: vertical;
         }
         textarea {
-            min-height: 120px;
+            min-height: 100px;
         }
         .btn {
             width: 100%;
-            padding: 15px;
-            font-size: 1.3em;
+            padding: 12px;
+            font-size: 1.1em;
             font-family: 'Orbitron', monospace;
             font-weight: 700;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             margin-top: 10px;
         }
         .analyze-btn {
@@ -193,14 +215,18 @@
             color: white;
         }
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
         }
+        .btn:active {
+            transform: translateY(0);
+        }
+        
         .results {
             background: rgba(0, 204, 255, 0.1);
             border: 2px solid #00ccff;
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 20px;
             backdrop-filter: blur(10px);
             box-shadow: 0 0 50px rgba(0, 204, 255, 0.3);
             display: none;
@@ -217,8 +243,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            flex-wrap: wrap;
         }
         .result-item:last-child {
             border-bottom: none;
@@ -226,26 +253,31 @@
         .result-label {
             font-weight: 700;
             color: #00ccff;
+            font-size: 0.9em;
+            min-width: 40%;
         }
         .result-value {
             color: #00ff88;
             font-weight: 400;
             text-align: right;
+            font-size: 0.9em;
+            word-break: break-all;
         }
         .error {
             background: rgba(255, 0, 136, 0.2);
             border: 2px solid #ff0088;
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 15px;
             color: #ff0088;
             text-align: center;
             margin-top: 20px;
+            font-size: 0.9em;
         }
         .loading {
             text-align: center;
             padding: 20px;
             color: #00ff88;
-            font-size: 1.2em;
+            font-size: 1em;
         }
         .spinner {
             display: inline-block;
@@ -261,25 +293,68 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Data Table Styles */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
+        /* Entry Manager Styles */
+        .connection-status {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 8px;
+            font-size: 0.8em;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .controls button {
+            padding: 8px 10px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.8em;
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .controls button:hover {
+            background: rgba(0, 255, 136, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Mobile-optimized table */
+        .table-container {
+            overflow-x: auto;
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
-            overflow: hidden;
+            border: 2px solid rgba(0, 255, 136, 0.2);
+        }
+        .data-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
         }
         .data-table th, .data-table td {
-            padding: 12px;
+            padding: 8px 6px;
             text-align: left;
             border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            font-size: 0.8em;
         }
         .data-table th {
             background: rgba(0, 255, 136, 0.2);
             color: #00ccff;
             font-weight: 700;
             text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 5;
         }
         .data-table td {
             color: #00ff88;
@@ -291,37 +366,118 @@
             background: #ff0088;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8em;
+            font-size: 0.7em;
             font-family: 'Orbitron', monospace;
         }
         .delete-btn:hover {
             background: #cc0066;
         }
-        .controls {
+
+        /* Bulk status update styles */
+        .bulk-status-controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin: 10px 0;
             flex-wrap: wrap;
+            align-items: center;
         }
-        .controls button {
-            flex: 1;
-            min-width: 120px;
-            padding: 10px;
+        .bulk-status-controls select {
+            padding: 6px 8px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8em;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 6px;
+            color: #00ff88;
+            outline: none;
+        }
+        .bulk-status-controls button {
+            padding: 6px 12px;
             font-family: 'Orbitron', monospace;
             font-weight: 700;
+            font-size: 0.7em;
             border: 2px solid #00ff88;
-            border-radius: 10px;
+            border-radius: 6px;
             background: rgba(0, 255, 136, 0.1);
             color: #00ff88;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-transform: uppercase;
         }
-        .controls button:hover {
+        .bulk-status-controls button:hover {
             background: rgba(0, 255, 136, 0.3);
-            transform: translateY(-2px);
+        }
+
+        /* Card element styling for Stripe */
+        #card-element {
+            padding: 12px;
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #00ff88;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 1.8em;
+            }
+            .nav-btn {
+                font-size: 0.7em;
+                padding: 8px 6px;
+                min-width: 80px;
+            }
+            .alien {
+                font-size: 30px;
+                right: 2%;
+                top: 10%;
+            }
+            .ufo {
+                font-size: 25px;
+                left: 2%;
+                bottom: 3%;
+            }
+            .section {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            .section h2 {
+                font-size: 1.1em;
+            }
+            .container {
+                padding: 5px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.5em;
+            }
+            .nav-menu {
+                gap: 5px;
+            }
+            .nav-btn {
+                font-size: 0.65em;
+                padding: 6px 4px;
+                min-width: 70px;
+            }
+            .section {
+                padding: 12px;
+            }
+            .btn {
+                padding: 10px;
+                font-size: 1em;
+            }
+            .result-label, .result-value {
+                font-size: 0.8em;
+            }
+            .data-table th, .data-table td {
+                padding: 6px 4px;
+                font-size: 0.7em;
+            }
         }
     </style>
 </head>
@@ -333,9 +489,9 @@
     <div class="nav-container">
         <h1 class="title">COSMIC CARD ANALYZER</h1>
         <div class="nav-menu">
-            <button class="nav-btn active" onclick="showPage('analyzer')">🔍 Card Analyzer</button>
-            <button class="nav-btn" onclick="showPage('tester')">💳 Card Tester</button>
-            <button class="nav-btn" onclick="showPage('manager')">📊 Entry Manager</button>
+            <button class="nav-btn active" onclick="showPage('analyzer')">🔍 Analyzer</button>
+            <button class="nav-btn" onclick="showPage('tester')">💳 Tester</button>
+            <button class="nav-btn" onclick="showPage('manager')">📊 Manager</button>
         </div>
     </div>
 
@@ -380,35 +536,51 @@
                 <h2>📊 Entry Manager</h2>
                 
                 <!-- Connection Status -->
-                <div id="connection-status" style="text-align: center; margin-bottom: 15px; padding: 10px; background: rgba(0, 255, 136, 0.1); border-radius: 10px; font-size: 0.9em;">
-                    🔄 Initializing database connection...
+                <div id="connection-status" class="connection-status">
+                    🔄 Initializing storage...
                 </div>
                 
                 <div class="controls">
-                    <button onclick="showAddForm()">➕ Add Entry</button>
-                    <button onclick="showBulkForm()">📋 Bulk Add</button>
-                    <button onclick="clearAllEntries()">🗑️ Clear All</button>
+                    <button onclick="showAddForm()">➕ Add</button>
+                    <button onclick="showBulkForm()">📋 Bulk</button>
+                    <button onclick="clearAllEntries()">🗑️ Clear</button>
                     <button onclick="exportData()">💾 Export</button>
                     <button onclick="refreshData()">🔄 Refresh</button>
+                </div>
+
+                <!-- Bulk Status Update Controls -->
+                <div class="bulk-status-controls">
+                    <span style="color: #00ccff; font-size: 0.8em; font-weight: 700;">BULK UPDATE:</span>
+                    <select id="bulk-status-select">
+                        <option value="">Select Status</option>
+                        <option value="Live">Live</option>
+                        <option value="Dead">Dead</option>
+                        <option value="Unknown">Unknown</option>
+                        <option value="Testing">Testing</option>
+                        <option value="Declined">Declined</option>
+                    </select>
+                    <button onclick="updateSelectedStatus()">Update Selected</button>
+                    <button onclick="selectAll()">Select All</button>
+                    <button onclick="clearSelection()">Clear Selection</button>
                 </div>
 
                 <!-- Add Single Entry Form -->
                 <div id="add-form" style="display: none;">
                     <div class="input-group">
                         <label class="input-label">Card Number</label>
-                        <input type="text" id="card-number" placeholder="Card number">
+                        <input type="text" id="card-number" placeholder="Card number" inputmode="numeric">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Expiry (MM/YY)</label>
-                        <input type="text" id="expiry" placeholder="MM/YY">
+                        <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
                     </div>
                     <div class="input-group">
                         <label class="input-label">CVV</label>
-                        <input type="text" id="cvv" placeholder="CVV">
+                        <input type="text" id="cvv" placeholder="CVV" maxlength="4" inputmode="numeric">
                     </div>
                     <div class="input-group">
                         <label class="input-label">ZIP Code</label>
-                        <input type="text" id="zip" placeholder="ZIP Code">
+                        <input type="text" id="zip" placeholder="ZIP Code" maxlength="10">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Status</label>
@@ -420,7 +592,7 @@
                 <!-- Bulk Add Form -->
                 <div id="bulk-form" style="display: none;">
                     <div class="input-group">
-                        <label class="input-label">Paste Card Data (Auto-organizes format)</label>
+                        <label class="input-label">Paste Card Data</label>
                         <textarea id="bulk-data" placeholder="Paste cards here. Supports formats like:
 4111111111111111|12|25|123|12345
 4111-1111-1111-1111 12/25 123 12345
@@ -430,22 +602,25 @@
                 </div>
 
                 <!-- Data Table -->
-                <table class="data-table" id="entries-table">
-                    <thead>
-                        <tr>
-                            <th>Card Number</th>
-                            <th>Expiry</th>
-                            <th>CVV</th>
-                            <th>ZIP</th>
-                            <th>Status</th>
-                            <th>Added</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="entries-tbody">
-                        <!-- Entries will be added here -->
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table class="data-table" id="entries-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()"></th>
+                                <th>Card Number</th>
+                                <th>Expiry</th>
+                                <th>CVV</th>
+                                <th>ZIP</th>
+                                <th>Status</th>
+                                <th>Added</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entries-tbody">
+                            <!-- Entries will be added here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -482,7 +657,11 @@
             onSnapshot,
             query,
             orderBy,
-            serverTimestamp
+            serverTimestamp,
+            updateDoc: async (docRef, data) => {
+                const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+                return updateDoc(docRef, data);
+            }
         };
 
         console.log("🔥 Firebase initialized successfully");
@@ -497,6 +676,7 @@
         // Global variables
         let entries = [];
         let isFirebaseConnected = false;
+        let selectedEntries = new Set();
 
         // Navigation
         function showPage(pageId) {
@@ -507,7 +687,7 @@
             event.target.classList.add('active');
         }
 
-        // =============== CARD ANALYZER (Using binx.cc) ===============
+        // =============== CARD ANALYZER ===============
         async function analyzeCard() {
             const resultContent = document.getElementById('analyzerResultContent');
             const binInput = document.getElementById('bin-input').value.replace(/\D/g, '');
@@ -523,25 +703,33 @@
             document.getElementById('analyzer-results').classList.add('show');
 
             try {
-                const res = await fetch(`https://binx.cc/api/${bin}`, {
+                // Use your enhanced BIN lookup API with multiple fallbacks
+                const res = await fetch(`/api/bin/${bin}`, {
                     headers: {
                         'Accept': 'application/json',
                         'User-Agent': 'Cosmic-Card-Analyzer'
                     }
                 });
                 
-                if (!res.ok) throw new Error('BIN lookup failed');
+                if (!res.ok) throw new Error('BIN lookup service unavailable');
                 
                 const data = await res.json();
 
-                const brand = data.brand || data.scheme || 'Unknown';
-                const bank = data.bank || data.issuer || 'Unknown Bank';
-                const country = data.country || 'Unknown';
-                const currency = data.currency || 'USD';
-                const level = data.level || data.type || 'Unknown';
-                const cardType = data.cardType || (data.prepaid ? 'Prepaid' : 'Credit/Debit');
+                // Handle both successful and unsuccessful responses
+                if (data.error) {
+                    throw new Error(data.error);
+                }
 
-                resultContent.innerHTML = `
+                const brand = data.brand || 'Unknown';
+                const bank = data.issuer || 'Unknown Bank';
+                const country = data.country?.name || 'Unknown';
+                const currency = data.country?.currency || 'USD';
+                const level = data.level || 'Unknown';
+                const cardType = data.cardType || 'Unknown';
+                const bankPhone = data.bankPhone;
+                const bankUrl = data.bankUrl;
+
+                let resultHTML = `
                     <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${bin}</span></div>
                     <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${brand.toUpperCase()}</span></div>
                     <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${bank}</span></div>
@@ -549,10 +737,36 @@
                     <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${currency}</span></div>
                     <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level.toUpperCase()}</span></div>
                     <div class="result-item"><span class="result-label">🔍 TYPE:</span><span class="result-value">${cardType.toUpperCase()}</span></div>
-                    <div style="margin-top:20px;color:#00ccff;text-align:center;font-size:0.9em;">
-                        Data provided by binx.cc
+                `;
+
+                // Add additional info if available
+                if (data.prepaid !== undefined) {
+                    resultHTML += `<div class="result-item"><span class="result-label">💰 PREPAID:</span><span class="result-value">${data.prepaid ? 'YES' : 'NO'}</span></div>`;
+                }
+                
+                if (data.commercial !== undefined) {
+                    resultHTML += `<div class="result-item"><span class="result-label">🏢 COMMERCIAL:</span><span class="result-value">${data.commercial ? 'YES' : 'NO'}</span></div>`;
+                }
+
+                if (bankPhone) {
+                    resultHTML += `<div class="result-item"><span class="result-label">📞 BANK PHONE:</span><span class="result-value">${bankPhone}</span></div>`;
+                }
+
+                if (bankUrl) {
+                    resultHTML += `<div class="result-item"><span class="result-label">🌐 BANK URL:</span><span class="result-value" style="font-size:0.7em;"><a href="${bankUrl}" target="_blank" style="color:#00ff88;">${bankUrl}</a></span></div>`;
+                }
+
+                // Status footer
+                const statusColor = data.success ? '#00ff88' : '#ff8800';
+                const statusIcon = data.success ? '✅' : '⚠️';
+                resultHTML += `
+                    <div style="margin-top:20px;color:${statusColor};text-align:center;font-size:0.8em;">
+                        ${statusIcon} ${data.message || 'BIN lookup completed'}
                     </div>
                 `;
+
+                resultContent.innerHTML = resultHTML;
+
             } catch (err) {
                 resultContent.innerHTML = `<div class="error">🚨 BIN lookup failed: ${err.message}</div>`;
             }
@@ -565,17 +779,10 @@
             style: {
                 base: {
                     fontFamily: "'Orbitron', monospace",
-                    fontSize: '18px',
+                    fontSize: '16px',
                     color: '#00ff88',
                     '::placeholder': { color: '#00ccff' }
                 }
-            }
-        });
-        
-        // Mount card element when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('card-element')) {
-                cardElement.mount('#card-element');
             }
         });
 
@@ -607,7 +814,7 @@
                         <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${paymentIntent.payment_method_details.card.brand.toUpperCase()}</span></div>
                         <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${paymentIntent.payment_method_details.card.last4}</span></div>
                         <div class="result-item"><span class="result-label">💸 AMOUNT:</span><span class="result-value">$0.50</span></div>
-                        <div class="result-item"><span class="result-label">🆔 ID:</span><span class="result-value" style="font-size:0.8em;">${paymentIntent.id}</span></div>
+                        <div class="result-item"><span class="result-label">🆔 ID:</span><span class="result-value" style="font-size:0.7em;">${paymentIntent.id}</span></div>
                         <div style="margin-top:20px;color:#00ccff;text-align:center;">
                             🟢 Transaction succeeded! Card is valid.
                         </div>
@@ -737,7 +944,7 @@
                 id: Date.now() + Math.random(),
                 added: new Date().toLocaleString()
             };
-            entries.push(entry);
+            entries.unshift(entry); // Add to beginning
             localStorage.setItem('cosmicEntries', JSON.stringify(entries));
             renderEntries();
         }
@@ -798,15 +1005,149 @@
             }
         }
 
+        // Update entry status (single entry)
+        async function updateEntryStatus(id, newStatus) {
+            if (isFirebaseConnected) {
+                try {
+                    // For Firebase, we need to update the document
+                    const docRef = window.firebaseUtils.doc(window.firebaseDB, 'cardEntries', id);
+                    await window.firebaseUtils.updateDoc(docRef, { 
+                        status: newStatus,
+                        lastUpdated: window.firebaseUtils.serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error('Error updating status in Firebase:', error);
+                    // Fallback to local update
+                    updateLocalEntryStatus(id, newStatus);
+                }
+            } else {
+                updateLocalEntryStatus(id, newStatus);
+            }
+        }
+
+        // Update entry status locally
+        function updateLocalEntryStatus(id, newStatus) {
+            const entryIndex = entries.findIndex(entry => entry.id === id);
+            if (entryIndex !== -1) {
+                entries[entryIndex].status = newStatus;
+                entries[entryIndex].lastUpdated = new Date().toLocaleString();
+                localStorage.setItem('cosmicEntries', JSON.stringify(entries));
+                renderEntries();
+            }
+        }
+
+        // Bulk status update functions
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            const entryCheckboxes = document.querySelectorAll('.entry-checkbox');
+            
+            if (selectAllCheckbox.checked) {
+                entryCheckboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                    selectedEntries.add(checkbox.value);
+                });
+            } else {
+                entryCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                selectedEntries.clear();
+            }
+            updateSelectionUI();
+        }
+
+        function toggleEntrySelection(entryId, checkbox) {
+            if (checkbox.checked) {
+                selectedEntries.add(entryId);
+            } else {
+                selectedEntries.delete(entryId);
+                document.getElementById('select-all-checkbox').checked = false;
+            }
+            updateSelectionUI();
+        }
+
+        function selectAll() {
+            document.getElementById('select-all-checkbox').checked = true;
+            toggleSelectAll();
+        }
+
+        function clearSelection() {
+            document.getElementById('select-all-checkbox').checked = false;
+            selectedEntries.clear();
+            document.querySelectorAll('.entry-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            const count = selectedEntries.size;
+            const bulkControls = document.querySelector('.bulk-status-controls');
+            if (count > 0) {
+                bulkControls.style.background = 'rgba(0, 255, 136, 0.1)';
+                bulkControls.style.border = '1px solid rgba(0, 255, 136, 0.3)';
+                bulkControls.style.borderRadius = '8px';
+                bulkControls.style.padding = '10px';
+            } else {
+                bulkControls.style.background = '';
+                bulkControls.style.border = '';
+                bulkControls.style.padding = '';
+            }
+        }
+
+        async function updateSelectedStatus() {
+            const newStatus = document.getElementById('bulk-status-select').value;
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+
+            if (selectedEntries.size === 0) {
+                alert('Please select entries to update');
+                return;
+            }
+
+            if (!confirm(`Update ${selectedEntries.size} entries to "${newStatus}"?`)) {
+                return;
+            }
+
+            const updatePromises = Array.from(selectedEntries).map(entryId => 
+                updateEntryStatus(entryId, newStatus)
+            );
+
+            try {
+                await Promise.all(updatePromises);
+                alert(`Updated ${selectedEntries.size} entries to "${newStatus}"`);
+                clearSelection();
+                document.getElementById('bulk-status-select').value = '';
+            } catch (error) {
+                console.error('Error updating statuses:', error);
+                alert('Some updates may have failed. Please check and try again.');
+            }
+        }
+
         // Form functions
         function showAddForm() {
-            document.getElementById('add-form').style.display = 'block';
-            document.getElementById('bulk-form').style.display = 'none';
+            const addForm = document.getElementById('add-form');
+            const bulkForm = document.getElementById('bulk-form');
+            
+            if (addForm.style.display === 'none') {
+                addForm.style.display = 'block';
+                bulkForm.style.display = 'none';
+            } else {
+                addForm.style.display = 'none';
+            }
         }
 
         function showBulkForm() {
-            document.getElementById('bulk-form').style.display = 'block';
-            document.getElementById('add-form').style.display = 'none';
+            const addForm = document.getElementById('add-form');
+            const bulkForm = document.getElementById('bulk-form');
+            
+            if (bulkForm.style.display === 'none') {
+                bulkForm.style.display = 'block';
+                addForm.style.display = 'none';
+            } else {
+                bulkForm.style.display = 'none';
+            }
         }
 
         // Add single entry
@@ -830,7 +1171,7 @@
                 status: status
             };
 
-            await saveEntry(entryData);
+            saveEntry(entryData);
 
             // Clear form
             document.getElementById('card-number').value = '';
@@ -838,12 +1179,18 @@
             document.getElementById('cvv').value = '';
             document.getElementById('zip').value = '';
             document.getElementById('status').value = 'Unknown';
+            
+            // Hide form after adding
+            document.getElementById('add-form').style.display = 'none';
         }
 
         // Add bulk entries
         async function addBulkEntries() {
             const bulkData = document.getElementById('bulk-data').value.trim();
-            if (!bulkData) return;
+            if (!bulkData) {
+                alert('Please paste some card data');
+                return;
+            }
 
             const lines = bulkData.split('\n').filter(line => line.trim());
             let addedCount = 0;
@@ -859,12 +1206,13 @@
                         status: 'Unknown'
                     };
                     
-                    await saveEntry(entryData);
+                    saveEntry(entryData);
                     addedCount++;
                 }
             }
 
             document.getElementById('bulk-data').value = '';
+            document.getElementById('bulk-form').style.display = 'none';
             alert(`Added ${addedCount} entries`);
         }
 
@@ -873,10 +1221,15 @@
             line = line.replace(/\s+/g, ' ').trim();
             
             const patterns = [
+                // Format: 4111111111111111|12|25|123|12345
                 /^(\d{13,19})\|(\d{1,2})\|(\d{2,4})\|(\d{3,4})\|(\d{5})$/,
+                // Format: 4111111111111111|12/25|123|12345
                 /^(\d{13,19})\|(\d{1,2}\/\d{2,4})\|(\d{3,4})\|(\d{5})$/,
+                // Format: 4111-1111-1111-1111 12/25 123 12345
                 /^([\d\s\-]{13,25})\s+(\d{1,2}\/\d{2,4})\s+(\d{3,4})\s+(\d{5})$/,
+                // Format: 4111 1111 1111 1111 12 25 123 12345
                 /^(\d{13,19})\s+(\d{1,2})\s+(\d{2,4})\s+(\d{3,4})\s+(\d{5})$/,
+                // Just card number
                 /^(\d{13,19})$/
             ];
 
@@ -888,12 +1241,11 @@
                     let cvv = match[3] || '';
                     let zip = match[4] || match[5] || '';
 
-                    if (expiry && !expiry.includes('/')) {
-                        if (match[3] && match[3].length <= 2) {
-                            expiry = match[2] + '/' + match[3];
-                            cvv = match[4] || '';
-                            zip = match[5] || '';
-                        }
+                    // Handle MM|YY format
+                    if (expiry && !expiry.includes('/') && match[3] && match[3].length <= 2) {
+                        expiry = match[2] + '/' + match[3];
+                        cvv = match[4] || '';
+                        zip = match[5] || '';
                     }
 
                     return { cardNumber, expiry, cvv, zip };
@@ -914,6 +1266,11 @@
 
         // Export data
         function exportData() {
+            if (entries.length === 0) {
+                alert('No entries to export');
+                return;
+            }
+
             const csv = 'Card Number,Expiry,CVV,ZIP,Status,Added\n' + 
                        entries.map(e => `${e.cardNumber},${e.expiry},${e.cvv},${e.zip},${e.status},${e.added}`).join('\n');
             
@@ -930,11 +1287,13 @@
         function renderEntries() {
             const tbody = document.getElementById('entries-tbody');
             tbody.innerHTML = '';
+            selectedEntries.clear(); // Clear selection when re-rendering
+            updateSelectionUI();
 
             if (entries.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align: center; color: #00ccff; padding: 30px;">
+                        <td colspan="8" style="text-align: center; color: #00ccff; padding: 30px;">
                             📭 No entries yet. Add some cards to get started!
                         </td>
                     </tr>
@@ -945,18 +1304,68 @@
             entries.forEach(entry => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="entry-checkbox" value="${entry.id}" 
+                               onchange="toggleEntrySelection('${entry.id}', this)">
+                    </td>
                     <td>${maskCardNumber(entry.cardNumber)}</td>
                     <td>${entry.expiry}</td>
                     <td>${entry.cvv}</td>
                     <td>${entry.zip}</td>
-                    <td style="color: ${getStatusColor(entry.status)}">${entry.status}</td>
-                    <td style="font-size: 0.8em;">${entry.added}</td>
+                    <td class="status-cell" onclick="editStatus('${entry.id}', this)">
+                        <span style="color: ${getStatusColor(entry.status)}">${entry.status}</span>
+                        <span class="edit-icon">✏️</span>
+                    </td>
+                    <td style="font-size: 0.7em;">${formatDate(entry.added)}</td>
                     <td>
                         <button class="delete-btn" onclick="deleteEntry('${entry.id}')">🗑️</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
+
+            // Reset select all checkbox
+            document.getElementById('select-all-checkbox').checked = false;
+        }
+
+        // Edit status inline
+        function editStatus(entryId, statusCell) {
+            const currentStatus = entries.find(e => e.id === entryId)?.status || 'Unknown';
+            
+            // Create select element
+            const select = document.createElement('select');
+            select.className = 'status-select';
+            select.innerHTML = `
+                <option value="Live" ${currentStatus === 'Live' ? 'selected' : ''}>Live</option>
+                <option value="Dead" ${currentStatus === 'Dead' ? 'selected' : ''}>Dead</option>
+                <option value="Unknown" ${currentStatus === 'Unknown' ? 'selected' : ''}>Unknown</option>
+                <option value="Testing" ${currentStatus === 'Testing' ? 'selected' : ''}>Testing</option>
+                <option value="Declined" ${currentStatus === 'Declined' ? 'selected' : ''}>Declined</option>
+            `;
+            
+            // Replace cell content with select
+            statusCell.innerHTML = '';
+            statusCell.appendChild(select);
+            select.focus();
+            
+            // Handle selection change
+            select.onchange = async function() {
+                const newStatus = select.value;
+                await updateEntryStatus(entryId, newStatus);
+            };
+            
+            // Handle clicking outside or pressing escape
+            select.onblur = function() {
+                renderEntries(); // Re-render to restore original display
+            };
+            
+            select.onkeydown = function(e) {
+                if (e.key === 'Escape') {
+                    renderEntries(); // Cancel edit
+                } else if (e.key === 'Enter') {
+                    select.blur(); // Trigger onblur to save
+                }
+            };
         }
 
         // Mask card number for security
@@ -972,14 +1381,28 @@
                 case 'live': return '#00ff88';
                 case 'dead': return '#ff0088';
                 case 'unknown': return '#00ccff';
+                case 'testing': return '#ffaa00';
+                case 'declined': return '#ff4444';
                 default: return '#ffffff';
+            }
+        }
+
+        // Format date for mobile
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } catch (e) {
+                return dateString;
             }
         }
 
         // Create stars animation
         function createStars() {
             const starsContainer = document.querySelector('.stars');
-            for (let i = 0; i < 100; i++) {
+            const starCount = window.innerWidth < 768 ? 50 : 100; // Fewer stars on mobile
+            
+            for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.classList.add('star');
                 star.style.left = Math.random() * 100 + '%';
@@ -996,10 +1419,50 @@
             initializeFirebase();
             
             // Mount Stripe card element
-            if (document.getElementById('card-element')) {
+            try {
                 cardElement.mount('#card-element');
+            } catch (error) {
+                console.error('Error mounting Stripe card element:', error);
             }
         };
+
+        // Initialize app
+        function initApp() {
+            console.log('🚀 Initializing Cosmic Card Analyzer...');
+            createStars();
+            initializeFirebase();
+            
+            // Mount Stripe card element
+            try {
+                cardElement.mount('#card-element');
+            } catch (error) {
+                console.error('Error mounting Stripe card element:', error);
+            }
+        }
+
+        // Auto-format expiry input
+        document.addEventListener('DOMContentLoaded', () => {
+            const expiryInput = document.getElementById('expiry');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Auto-format card number input (add spaces every 4 digits)
+            const cardInput = document.getElementById('card-number');
+            if (cardInput) {
+                cardInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    value = value.substring(0, 19); // Limit to 19 digits
+                    value = value.replace(/(.{4})/g, '$1 ').trim();
+                    e.target.value = value;
+                });
+            }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
@@ -1007,6 +1470,39 @@
                 window.initApp();
             }
         });
+        });
+
+        // Handle window resize for responsive stars
+        window.addEventListener('resize', () => {
+            const starsContainer = document.querySelector('.stars');
+            starsContainer.innerHTML = '';
+            createStars();
+        });
+
+        // Add touch feedback for buttons
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.matches('.btn, .nav-btn, .controls button')) {
+                e.target.style.transform = 'scale(0.95)';
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (e.target.matches('.btn, .nav-btn, .controls button')) {
+                setTimeout(() => {
+                    e.target.style.transform = '';
+                }, 150);
+            }
+        });
+
+        // Prevent zoom on double tap for iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
