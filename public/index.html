@@ -173,7 +173,7 @@
             text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
             font-size: 0.9em;
         }
-        input[type="text"], input[type="number"], textarea {
+        input[type="text"], input[type="number"], textarea, select {
             width: 100%;
             padding: 12px;
             font-size: 1em;
@@ -362,19 +362,6 @@
         .data-table tr:hover {
             background: rgba(0, 255, 136, 0.1);
         }
-        .delete-btn {
-            background: #ff0088;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.7em;
-            font-family: 'Orbitron', monospace;
-        }
-        .delete-btn:hover {
-            background: #cc0066;
-        }
 
         /* Bulk status update styles */
         .bulk-status-controls {
@@ -418,6 +405,32 @@
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.7);
             color: #00ff88;
+        }
+
+        /* Status cell styling */
+        .status-cell {
+            cursor: pointer;
+            position: relative;
+        }
+        .status-cell:hover .edit-icon {
+            opacity: 1;
+        }
+        .edit-icon {
+            opacity: 0;
+            margin-left: 5px;
+            font-size: 0.7em;
+            transition: opacity 0.3s ease;
+        }
+        .status-select {
+            width: 100%;
+            padding: 4px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8em;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            color: #00ff88;
+            outline: none;
         }
 
         /* Mobile responsive adjustments */
@@ -543,7 +556,6 @@
                 <div class="controls">
                     <button onclick="showAddForm()">➕ Add</button>
                     <button onclick="showBulkForm()">📋 Bulk</button>
-                    <button onclick="clearAllEntries()">🗑️ Clear</button>
                     <button onclick="exportData()">💾 Export</button>
                     <button onclick="refreshData()">🔄 Refresh</button>
                 </div>
@@ -556,8 +568,6 @@
                         <option value="Live">Live</option>
                         <option value="Dead">Dead</option>
                         <option value="Unknown">Unknown</option>
-                        <option value="Testing">Testing</option>
-                        <option value="Declined">Declined</option>
                     </select>
                     <button onclick="updateSelectedStatus()">Update Selected</button>
                     <button onclick="selectAll()">Select All</button>
@@ -584,7 +594,11 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label">Status</label>
-                        <input type="text" id="status" placeholder="Live/Dead/Unknown" value="Unknown">
+                        <select id="status">
+                            <option value="Unknown">Unknown</option>
+                            <option value="Live">Live</option>
+                            <option value="Dead">Dead</option>
+                        </select>
                     </div>
                     <button class="btn entry-btn" onclick="addSingleEntry()">➕ ADD ENTRY</button>
                 </div>
@@ -593,10 +607,17 @@
                 <div id="bulk-form" style="display: none;">
                     <div class="input-group">
                         <label class="input-label">Paste Card Data</label>
-                        <textarea id="bulk-data" placeholder="Paste cards here. Supports formats like:
+                        <textarea id="bulk-data" placeholder="Paste cards here. Supports various formats:
+
 4111111111111111|12|25|123|12345
-4111-1111-1111-1111 12/25 123 12345
-4111 1111 1111 1111|12/25|123|12345"></textarea>
+4111-1111-1111-1111 12/25 123 12345  
+4111 1111 1111 1111|12/25|123|12345
+
+Full format with personal info:
+4744760307303802|012028|916|Regina Gutierrez|3591 Nw 91 Ln|Sunrise|FL|33351|US|7862462987|gabebriela@yahoo.com|
+
+Status prefixed format:
+Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|US|9783955105|hkkarp17@gmail.com|"></textarea>
                     </div>
                     <button class="btn entry-btn" onclick="addBulkEntries()">📋 PROCESS BULK DATA</button>
                 </div>
@@ -613,7 +634,6 @@
                                 <th>ZIP</th>
                                 <th>Status</th>
                                 <th>Added</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="entries-tbody">
@@ -949,53 +969,6 @@
             renderEntries();
         }
 
-        // Delete entry
-        async function deleteEntry(id) {
-            if (!confirm('Delete this entry?')) return;
-
-            if (isFirebaseConnected) {
-                try {
-                    await window.firebaseUtils.deleteDoc(
-                        window.firebaseUtils.doc(window.firebaseDB, 'cardEntries', id)
-                    );
-                } catch (error) {
-                    console.error('Error deleting from Firebase:', error);
-                    alert('Failed to delete from database');
-                }
-            } else {
-                entries = entries.filter(entry => entry.id !== id);
-                localStorage.setItem('cosmicEntries', JSON.stringify(entries));
-                renderEntries();
-            }
-        }
-
-        // Clear all entries
-        async function clearAllEntries() {
-            if (!confirm('Delete ALL entries? This cannot be undone.')) return;
-
-            if (isFirebaseConnected) {
-                try {
-                    const querySnapshot = await window.firebaseUtils.getDocs(
-                        window.firebaseUtils.collection(window.firebaseDB, 'cardEntries')
-                    );
-                    
-                    const deletePromises = querySnapshot.docs.map(doc => 
-                        window.firebaseUtils.deleteDoc(doc.ref)
-                    );
-                    
-                    await Promise.all(deletePromises);
-                    alert('All entries deleted from database');
-                } catch (error) {
-                    console.error('Error clearing Firebase:', error);
-                    alert('Failed to clear database');
-                }
-            } else {
-                entries = [];
-                localStorage.setItem('cosmicEntries', JSON.stringify(entries));
-                renderEntries();
-            }
-        }
-
         // Update connection status
         function updateConnectionStatus(message) {
             const statusDiv = document.getElementById('connection-status');
@@ -1156,7 +1129,7 @@
             const expiry = document.getElementById('expiry').value.trim();
             const cvv = document.getElementById('cvv').value.trim();
             const zip = document.getElementById('zip').value.trim();
-            const status = document.getElementById('status').value.trim() || 'Unknown';
+            const status = document.getElementById('status').value || 'Unknown';
 
             if (!cardNumber) {
                 alert('Card number is required');
@@ -1171,7 +1144,7 @@
                 status: status
             };
 
-            saveEntry(entryData);
+            await saveEntry(entryData);
 
             // Clear form
             document.getElementById('card-number').value = '';
@@ -1184,7 +1157,7 @@
             document.getElementById('add-form').style.display = 'none';
         }
 
-        // Add bulk entries
+        // Enhanced bulk entry processing
         async function addBulkEntries() {
             const bulkData = document.getElementById('bulk-data').value.trim();
             if (!bulkData) {
@@ -1194,6 +1167,7 @@
 
             const lines = bulkData.split('\n').filter(line => line.trim());
             let addedCount = 0;
+            let skippedCount = 0;
 
             for (const line of lines) {
                 const parsed = parseCardLine(line.trim());
@@ -1203,53 +1177,131 @@
                         expiry: parsed.expiry || '',
                         cvv: parsed.cvv || '',
                         zip: parsed.zip || '',
-                        status: 'Unknown'
+                        status: parsed.status || 'Unknown'
                     };
                     
-                    saveEntry(entryData);
+                    await saveEntry(entryData);
                     addedCount++;
+                } else {
+                    skippedCount++;
                 }
             }
 
             document.getElementById('bulk-data').value = '';
             document.getElementById('bulk-form').style.display = 'none';
-            alert(`Added ${addedCount} entries`);
+            
+            let message = `Added ${addedCount} entries`;
+            if (skippedCount > 0) {
+                message += `, skipped ${skippedCount} invalid lines`;
+            }
+            alert(message);
         }
 
-        // Parse card line for different formats
+        // Enhanced card line parser for multiple formats including full personal info
         function parseCardLine(line) {
+            // Remove extra whitespace and clean up the line
             line = line.replace(/\s+/g, ' ').trim();
             
-            const patterns = [
-                // Format: 4111111111111111|12|25|123|12345
-                /^(\d{13,19})\|(\d{1,2})\|(\d{2,4})\|(\d{3,4})\|(\d{5})$/,
-                // Format: 4111111111111111|12/25|123|12345
-                /^(\d{13,19})\|(\d{1,2}\/\d{2,4})\|(\d{3,4})\|(\d{5})$/,
-                // Format: 4111-1111-1111-1111 12/25 123 12345
-                /^([\d\s\-]{13,25})\s+(\d{1,2}\/\d{2,4})\s+(\d{3,4})\s+(\d{5})$/,
-                // Format: 4111 1111 1111 1111 12 25 123 12345
-                /^(\d{13,19})\s+(\d{1,2})\s+(\d{2,4})\s+(\d{3,4})\s+(\d{5})$/,
-                // Just card number
-                /^(\d{13,19})$/
-            ];
-
-            for (let pattern of patterns) {
-                const match = line.match(pattern);
-                if (match) {
-                    let cardNumber = match[1].replace(/[\s\-]/g, '');
-                    let expiry = match[2] || '';
-                    let cvv = match[3] || '';
-                    let zip = match[4] || match[5] || '';
-
-                    // Handle MM|YY format
-                    if (expiry && !expiry.includes('/') && match[3] && match[3].length <= 2) {
-                        expiry = match[2] + '/' + match[3];
-                        cvv = match[4] || '';
-                        zip = match[5] || '';
+            // Remove any ** markers at the beginning or end
+            line = line.replace(/^\*\*|\*\*$/g, '').trim();
+            
+            let status = 'Unknown';
+            let cardNumber = null;
+            let expiry = '';
+            let cvv = '';
+            let zip = '';
+            
+            // Check if line starts with a status (Live|, Dead|, Unknown|)
+            const statusMatch = line.match(/^(Live|Dead|Unknown)\|(.+)$/i);
+            if (statusMatch) {
+                status = statusMatch[1];
+                line = statusMatch[2];
+            }
+            
+            // Split by pipe characters for pipe-delimited formats
+            if (line.includes('|')) {
+                const parts = line.split('|').map(part => part.trim());
+                
+                if (parts.length >= 3) {
+                    // Basic format: cardNumber|expiry|cvv|... or full format with personal info
+                    cardNumber = parts[0].replace(/\D/g, '');
+                    
+                    // Handle different expiry formats
+                    let expiryPart = parts[1];
+                    if (expiryPart.length === 6) {
+                        // Format: MMYYYY -> MM/YY
+                        expiry = expiryPart.slice(0, 2) + '/' + expiryPart.slice(4, 6);
+                    } else if (expiryPart.length === 4) {
+                        // Format: MMYY -> MM/YY
+                        expiry = expiryPart.slice(0, 2) + '/' + expiryPart.slice(2, 4);
+                    } else if (expiryPart.includes('/')) {
+                        // Already formatted MM/YY
+                        expiry = expiryPart;
+                    } else {
+                        expiry = expiryPart;
                     }
-
-                    return { cardNumber, expiry, cvv, zip };
+                    
+                    cvv = parts[2];
+                    
+                    // If there are more parts, look for ZIP code
+                    // ZIP could be in various positions depending on format
+                    if (parts.length >= 4) {
+                        // For full format with name and address, ZIP is usually around position 7-8
+                        if (parts.length >= 8) {
+                            // Full format: card|expiry|cvv|name|address|city|state|zip|country|phone|email
+                            zip = parts[7] || '';
+                        } else {
+                            // Simple format: card|expiry|cvv|zip
+                            zip = parts[3] || '';
+                        }
+                    }
                 }
+            } else {
+                // Try space-separated formats
+                const spacePatterns = [
+                    // Format: 4111-1111-1111-1111 12/25 123 12345
+                    /^([\d\s\-]{13,25})\s+(\d{1,2}\/\d{2,4})\s+(\d{3,4})\s+(\d{5,10})$/,
+                    // Format: 4111 1111 1111 1111 12 25 123 12345
+                    /^([\d\s]{13,25})\s+(\d{1,2})\s+(\d{2,4})\s+(\d{3,4})\s+(\d{5,10})$/,
+                    // Just card number
+                    /^(\d{13,19})$/
+                ];
+
+                for (let pattern of spacePatterns) {
+                    const match = line.match(pattern);
+                    if (match) {
+                        cardNumber = match[1].replace(/[\s\-]/g, '');
+                        
+                        if (match[2]) {
+                            if (match[2].includes('/')) {
+                                expiry = match[2];
+                            } else {
+                                // Handle MM YY format
+                                expiry = match[2] + '/' + (match[3] || '');
+                                cvv = match[4] || '';
+                                zip = match[5] || '';
+                            }
+                        }
+                        
+                        if (match[3] && match[2].includes('/')) {
+                            cvv = match[3];
+                            zip = match[4] || '';
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+
+            // Validate card number
+            if (cardNumber && cardNumber.length >= 13 && cardNumber.length <= 19) {
+                return { 
+                    cardNumber, 
+                    expiry: expiry.replace(/\D/g, '').length >= 4 ? expiry : '', 
+                    cvv: cvv.replace(/\D/g, ''), 
+                    zip: zip.replace(/\D/g, ''), 
+                    status 
+                };
             }
 
             return { cardNumber: null };
@@ -1287,13 +1339,13 @@
         function renderEntries() {
             const tbody = document.getElementById('entries-tbody');
             tbody.innerHTML = '';
-            selectedEntries.clear(); // Clear selection when re-rendering
+            selectedEntries.clear();
             updateSelectionUI();
 
             if (entries.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" style="text-align: center; color: #00ccff; padding: 30px;">
+                        <td colspan="7" style="text-align: center; color: #00ccff; padding: 30px;">
                             📭 No entries yet. Add some cards to get started!
                         </td>
                     </tr>
@@ -1317,14 +1369,10 @@
                         <span class="edit-icon">✏️</span>
                     </td>
                     <td style="font-size: 0.7em;">${formatDate(entry.added)}</td>
-                    <td>
-                        <button class="delete-btn" onclick="deleteEntry('${entry.id}')">🗑️</button>
-                    </td>
                 `;
                 tbody.appendChild(row);
             });
 
-            // Reset select all checkbox
             document.getElementById('select-all-checkbox').checked = false;
         }
 
@@ -1332,38 +1380,32 @@
         function editStatus(entryId, statusCell) {
             const currentStatus = entries.find(e => e.id === entryId)?.status || 'Unknown';
             
-            // Create select element
             const select = document.createElement('select');
             select.className = 'status-select';
             select.innerHTML = `
                 <option value="Live" ${currentStatus === 'Live' ? 'selected' : ''}>Live</option>
                 <option value="Dead" ${currentStatus === 'Dead' ? 'selected' : ''}>Dead</option>
                 <option value="Unknown" ${currentStatus === 'Unknown' ? 'selected' : ''}>Unknown</option>
-                <option value="Testing" ${currentStatus === 'Testing' ? 'selected' : ''}>Testing</option>
-                <option value="Declined" ${currentStatus === 'Declined' ? 'selected' : ''}>Declined</option>
             `;
             
-            // Replace cell content with select
             statusCell.innerHTML = '';
             statusCell.appendChild(select);
             select.focus();
             
-            // Handle selection change
             select.onchange = async function() {
                 const newStatus = select.value;
                 await updateEntryStatus(entryId, newStatus);
             };
             
-            // Handle clicking outside or pressing escape
             select.onblur = function() {
-                renderEntries(); // Re-render to restore original display
+                renderEntries();
             };
             
             select.onkeydown = function(e) {
                 if (e.key === 'Escape') {
-                    renderEntries(); // Cancel edit
+                    renderEntries();
                 } else if (e.key === 'Enter') {
-                    select.blur(); // Trigger onblur to save
+                    select.blur();
                 }
             };
         }
@@ -1381,8 +1423,6 @@
                 case 'live': return '#00ff88';
                 case 'dead': return '#ff0088';
                 case 'unknown': return '#00ccff';
-                case 'testing': return '#ffaa00';
-                case 'declined': return '#ff4444';
                 default: return '#ffffff';
             }
         }
@@ -1400,7 +1440,7 @@
         // Create stars animation
         function createStars() {
             const starsContainer = document.querySelector('.stars');
-            const starCount = window.innerWidth < 768 ? 50 : 100; // Fewer stars on mobile
+            const starCount = window.innerWidth < 768 ? 50 : 100;
             
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
@@ -1418,7 +1458,6 @@
             createStars();
             initializeFirebase();
             
-            // Mount Stripe card element
             try {
                 cardElement.mount('#card-element');
             } catch (error) {
@@ -1426,21 +1465,7 @@
             }
         };
 
-        // Initialize app
-        function initApp() {
-            console.log('🚀 Initializing Cosmic Card Analyzer...');
-            createStars();
-            initializeFirebase();
-            
-            // Mount Stripe card element
-            try {
-                cardElement.mount('#card-element');
-            } catch (error) {
-                console.error('Error mounting Stripe card element:', error);
-            }
-        }
-
-        // Auto-format expiry input
+        // Auto-format inputs
         document.addEventListener('DOMContentLoaded', () => {
             const expiryInput = document.getElementById('expiry');
             if (expiryInput) {
@@ -1453,23 +1478,19 @@
                 });
             }
 
-            // Auto-format card number input (add spaces every 4 digits)
             const cardInput = document.getElementById('card-number');
             if (cardInput) {
                 cardInput.addEventListener('input', function(e) {
                     let value = e.target.value.replace(/\D/g, '');
-                    value = value.substring(0, 19); // Limit to 19 digits
+                    value = value.substring(0, 19);
                     value = value.replace(/(.{4})/g, '$1 ').trim();
                     e.target.value = value;
                 });
             }
 
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
             if (window.firebaseDB) {
                 window.initApp();
             }
-        });
         });
 
         // Handle window resize for responsive stars
