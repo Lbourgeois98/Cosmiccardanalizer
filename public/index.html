@@ -127,7 +127,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 10px 15px;
             position: relative;
@@ -328,24 +328,27 @@
             transform: translateY(-1px);
         }
 
-        /* Mobile-optimized table */
+        /* Enhanced table for more data */
         .table-container {
             overflow-x: auto;
             margin-top: 20px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
             border: 2px solid rgba(0, 255, 136, 0.2);
+            max-height: 600px;
+            overflow-y: auto;
         }
         .data-table {
             width: 100%;
-            min-width: 600px;
+            min-width: 800px;
             border-collapse: collapse;
         }
         .data-table th, .data-table td {
             padding: 8px 6px;
             text-align: left;
             border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-            font-size: 0.8em;
+            font-size: 0.75em;
+            vertical-align: top;
         }
         .data-table th {
             background: rgba(0, 255, 136, 0.2);
@@ -358,9 +361,32 @@
         }
         .data-table td {
             color: #00ff88;
+            position: relative;
         }
         .data-table tr:hover {
             background: rgba(0, 255, 136, 0.1);
+        }
+
+        /* Bank grouping */
+        .bank-section {
+            margin: 20px 0;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .bank-header {
+            background: rgba(0, 255, 136, 0.2);
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+            font-weight: 700;
+            color: #00ccff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bank-content {
+            padding: 10px;
         }
 
         /* Bulk status update styles */
@@ -395,6 +421,56 @@
             text-transform: uppercase;
         }
         .bulk-status-controls button:hover {
+            background: rgba(0, 255, 136, 0.3);
+        }
+
+        /* Action buttons */
+        .action-btn {
+            padding: 4px 8px;
+            margin: 2px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.6em;
+            border: 1px solid;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .edit-btn {
+            color: #00ccff;
+            border-color: #00ccff;
+        }
+        .edit-btn:hover {
+            background: rgba(0, 204, 255, 0.2);
+        }
+        .delete-btn {
+            color: #ff0088;
+            border-color: #ff0088;
+        }
+        .delete-btn:hover {
+            background: rgba(255, 0, 136, 0.2);
+        }
+
+        /* View controls */
+        .view-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .view-toggle {
+            padding: 6px 12px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8em;
+            border: 2px solid #00ff88;
+            border-radius: 6px;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .view-toggle.active {
             background: rgba(0, 255, 136, 0.3);
         }
 
@@ -433,6 +509,40 @@
             outline: none;
         }
 
+        /* Edit form modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000511 100%);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 5% auto;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+        .close {
+            color: #ff0088;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close:hover {
+            color: #00ff88;
+        }
+
         /* Mobile responsive adjustments */
         @media (max-width: 768px) {
             .title {
@@ -463,6 +573,10 @@
             .container {
                 padding: 5px 10px;
             }
+            .data-table th, .data-table td {
+                padding: 4px 3px;
+                font-size: 0.65em;
+            }
         }
 
         @media (max-width: 480px) {
@@ -488,8 +602,8 @@
                 font-size: 0.8em;
             }
             .data-table th, .data-table td {
-                padding: 6px 4px;
-                font-size: 0.7em;
+                padding: 3px 2px;
+                font-size: 0.6em;
             }
         }
     </style>
@@ -514,8 +628,8 @@
             <div class="section">
                 <h2>🔍 Analyze Card Info</h2>
                 <div class="input-group">
-                    <label class="input-label">Card Number (First 6 Digits)</label>
-                    <input type="text" id="bin-input" placeholder="Enter first 6 digits" maxlength="6" inputmode="numeric">
+                    <label class="input-label">Card Number (First 6+ Digits)</label>
+                    <input type="text" id="bin-input" placeholder="Enter first 6-8 digits for best results" maxlength="19" inputmode="numeric">
                 </div>
                 <button class="btn analyze-btn" onclick="analyzeCard()">🔍 ANALYZE CARD INFO</button>
             </div>
@@ -558,6 +672,14 @@
                     <button onclick="showBulkForm()">📋 Bulk</button>
                     <button onclick="exportData()">💾 Export</button>
                     <button onclick="refreshData()">🔄 Refresh</button>
+                    <button onclick="clearAllData()">🗑️ Clear All</button>
+                </div>
+
+                <!-- View Controls -->
+                <div class="view-controls">
+                    <span style="color: #00ccff; font-size: 0.8em; font-weight: 700;">VIEW:</span>
+                    <button class="view-toggle active" onclick="setViewMode('table')">📊 Table</button>
+                    <button class="view-toggle" onclick="setViewMode('bank')">🏦 By Bank</button>
                 </div>
 
                 <!-- Bulk Status Update Controls -->
@@ -576,29 +698,47 @@
 
                 <!-- Add Single Entry Form -->
                 <div id="add-form" style="display: none;">
-                    <div class="input-group">
-                        <label class="input-label">Card Number</label>
-                        <input type="text" id="card-number" placeholder="Card number" inputmode="numeric">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Expiry (MM/YY)</label>
-                        <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">CVV</label>
-                        <input type="text" id="cvv" placeholder="CVV" maxlength="4" inputmode="numeric">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">ZIP Code</label>
-                        <input type="text" id="zip" placeholder="ZIP Code" maxlength="10">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Status</label>
-                        <select id="status">
-                            <option value="Unknown">Unknown</option>
-                            <option value="Live">Live</option>
-                            <option value="Dead">Dead</option>
-                        </select>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <div class="input-group">
+                            <label class="input-label">Card Number</label>
+                            <input type="text" id="card-number" placeholder="Card number" inputmode="numeric">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Expiry (MM/YY)</label>
+                            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">CVV</label>
+                            <input type="text" id="cvv" placeholder="CVV" maxlength="4" inputmode="numeric">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">ZIP Code</label>
+                            <input type="text" id="zip" placeholder="ZIP Code" maxlength="10">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Name</label>
+                            <input type="text" id="name" placeholder="Full Name">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Address</label>
+                            <input type="text" id="address" placeholder="Street Address">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">City</label>
+                            <input type="text" id="city" placeholder="City">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">State</label>
+                            <input type="text" id="state" placeholder="State" maxlength="2">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Status</label>
+                            <select id="status">
+                                <option value="Unknown">Unknown</option>
+                                <option value="Live">Live</option>
+                                <option value="Dead">Dead</option>
+                            </select>
+                        </div>
                     </div>
                     <button class="btn entry-btn" onclick="addSingleEntry()">➕ ADD ENTRY</button>
                 </div>
@@ -606,41 +746,110 @@
                 <!-- Bulk Add Form -->
                 <div id="bulk-form" style="display: none;">
                     <div class="input-group">
-                        <label class="input-label">Paste Card Data</label>
-                        <textarea id="bulk-data" placeholder="Paste cards here. Supports various formats:
+                        <label class="input-label">Paste Card Data (Auto-detects formats)</label>
+                        <textarea id="bulk-data" placeholder="Paste cards here. Supports formats like:
 
 4111111111111111|12|25|123|12345
 4111-1111-1111-1111 12/25 123 12345  
-4111 1111 1111 1111|12/25|123|12345
+4111 1111 1111 1111 12/25 123 12345
+4111111111111111,12,25,123,12345
 
-Full format with personal info:
-4744760307303802|012028|916|Regina Gutierrez|3591 Nw 91 Ln|Sunrise|FL|33351|US|7862462987|gabebriela@yahoo.com|
+Full format:
+4744760307303802|012028|916|Regina Gutierrez|3591 Nw 91 Ln|Sunrise|FL|33351|US|7862462987|gabebriela@yahoo.com
 
-Status prefixed format:
-Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|US|9783955105|hkkarp17@gmail.com|"></textarea>
+Status prefixed:
+Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|US|9783955105|hkkarp17@gmail.com
+
+Mixed formats OK - will auto-detect structure"></textarea>
                     </div>
                     <button class="btn entry-btn" onclick="addBulkEntries()">📋 PROCESS BULK DATA</button>
                 </div>
 
-                <!-- Data Table -->
-                <div class="table-container">
-                    <table class="data-table" id="entries-table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()"></th>
-                                <th>Card Number</th>
-                                <th>Expiry</th>
-                                <th>CVV</th>
-                                <th>ZIP</th>
-                                <th>Status</th>
-                                <th>Added</th>
-                            </tr>
-                        </thead>
-                        <tbody id="entries-tbody">
-                            <!-- Entries will be added here -->
-                        </tbody>
-                    </table>
+                <!-- Data Display -->
+                <div id="table-view">
+                    <div class="table-container">
+                        <table class="data-table" id="entries-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()"></th>
+                                    <th>Card Number</th>
+                                    <th>Exp</th>
+                                    <th>CVV</th>
+                                    <th>ZIP</th>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Bank</th>
+                                    <th>Status</th>
+                                    <th>Added</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="entries-tbody">
+                                <!-- Entries will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
+                <div id="bank-view" style="display: none;">
+                    <div id="bank-sections">
+                        <!-- Bank sections will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2 style="color: #00ccff; margin-bottom: 20px;">✏️ Edit Entry</h2>
+            <div id="edit-form">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div class="input-group">
+                        <label class="input-label">Card Number</label>
+                        <input type="text" id="edit-card-number" placeholder="Card number" inputmode="numeric">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Expiry (MM/YY)</label>
+                        <input type="text" id="edit-expiry" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">CVV</label>
+                        <input type="text" id="edit-cvv" placeholder="CVV" maxlength="4" inputmode="numeric">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">ZIP Code</label>
+                        <input type="text" id="edit-zip" placeholder="ZIP Code" maxlength="10">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Name</label>
+                        <input type="text" id="edit-name" placeholder="Full Name">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Address</label>
+                        <input type="text" id="edit-address" placeholder="Street Address">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">City</label>
+                        <input type="text" id="edit-city" placeholder="City">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">State</label>
+                        <input type="text" id="edit-state" placeholder="State" maxlength="2">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Status</label>
+                        <select id="edit-status">
+                            <option value="Unknown">Unknown</option>
+                            <option value="Live">Live</option>
+                            <option value="Dead">Dead</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn entry-btn" onclick="saveEditedEntry()">💾 SAVE CHANGES</button>
+                <button class="btn" style="background: linear-gradient(45deg, #666, #999); margin-top: 10px;" onclick="closeEditModal()">❌ CANCEL</button>
             </div>
         </div>
     </div>
@@ -697,6 +906,43 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
         let entries = [];
         let isFirebaseConnected = false;
         let selectedEntries = new Set();
+        let currentEditId = null;
+        let currentViewMode = 'table';
+
+        // Enhanced BIN database for better card analysis
+        const binDatabase = {
+            // Visa
+            '400000': { brand: 'Visa', bank: 'Visa Test Card', country: 'US', level: 'Classic', cardType: 'Debit' },
+            '401288': { brand: 'Visa', bank: 'Bank of America', country: 'US', level: 'Gold', cardType: 'Credit' },
+            '411111': { brand: 'Visa', bank: 'Visa Test Card', country: 'US', level: 'Classic', cardType: 'Credit' },
+            '424242': { brand: 'Visa', bank: 'Stripe Test Card', country: 'US', level: 'Classic', cardType: 'Credit' },
+            '440000': { brand: 'Visa', bank: 'Chase Bank', country: 'US', level: 'Platinum', cardType: 'Credit' },
+            '474426': { brand: 'Visa', bank: 'Wells Fargo', country: 'US', level: 'Classic', cardType: 'Debit' },
+            
+            // Mastercard
+            '222100': { brand: 'Mastercard', bank: 'Capital One', country: 'US', level: 'World', cardType: 'Credit' },
+            '510000': { brand: 'Mastercard', bank: 'Mastercard Test', country: 'US', level: 'Standard', cardType: 'Credit' },
+            '555555': { brand: 'Mastercard', bank: 'Mastercard Test', country: 'US', level: 'World Elite', cardType: 'Credit' },
+            '540988': { brand: 'Mastercard', bank: 'Citibank', country: 'US', level: 'World', cardType: 'Credit' },
+            '547020': { brand: 'Mastercard', bank: 'Bank of America', country: 'US', level: 'Platinum', cardType: 'Credit' },
+            
+            // American Express
+            '340000': { brand: 'American Express', bank: 'American Express', country: 'US', level: 'Gold', cardType: 'Charge' },
+            '370000': { brand: 'American Express', bank: 'American Express', country: 'US', level: 'Platinum', cardType: 'Charge' },
+            '378282': { brand: 'American Express', bank: 'American Express Test', country: 'US', level: 'Green', cardType: 'Charge' },
+            
+            // Discover
+            '601100': { brand: 'Discover', bank: 'Discover Bank', country: 'US', level: 'Classic', cardType: 'Credit' },
+            '622126': { brand: 'Discover', bank: 'Discover Bank', country: 'US', level: 'Platinum', cardType: 'Credit' },
+            
+            // Diners Club
+            '300000': { brand: 'Diners Club', bank: 'Diners Club International', country: 'US', level: 'Club', cardType: 'Charge' },
+            '305000': { brand: 'Diners Club', bank: 'Diners Club International', country: 'US', level: 'Premier', cardType: 'Charge' },
+            
+            // JCB
+            '353011': { brand: 'JCB', bank: 'JCB International', country: 'JP', level: 'Classic', cardType: 'Credit' },
+            '356000': { brand: 'JCB', bank: 'JCB International', country: 'JP', level: 'Gold', cardType: 'Credit' }
+        };
 
         // Navigation
         function showPage(pageId) {
@@ -707,7 +953,7 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             event.target.classList.add('active');
         }
 
-        // =============== CARD ANALYZER ===============
+        // =============== ENHANCED CARD ANALYZER ===============
         async function analyzeCard() {
             const resultContent = document.getElementById('analyzerResultContent');
             const binInput = document.getElementById('bin-input').value.replace(/\D/g, '');
@@ -718,36 +964,19 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                 return;
             }
 
-            const bin = binInput.slice(0, 6);
-            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Looking up BIN info...</div>`;
+            const bin = binInput.slice(0, 8); // Use up to 8 digits for better accuracy
+            resultContent.innerHTML = `<div class="loading"><span class="spinner"></span> Analyzing BIN ${bin}...</div>`;
             document.getElementById('analyzer-results').classList.add('show');
 
             try {
-                // Use your enhanced BIN lookup API with multiple fallbacks
-                const res = await fetch(`/api/bin/${bin}`, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'User-Agent': 'Cosmic-Card-Analyzer'
-                    }
-                });
+                let data = await lookupBINMultiSource(bin);
                 
-                if (!res.ok) throw new Error('BIN lookup service unavailable');
-                
-                const data = await res.json();
-
-                // Handle both successful and unsuccessful responses
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
                 const brand = data.brand || 'Unknown';
-                const bank = data.issuer || 'Unknown Bank';
-                const country = data.country?.name || 'Unknown';
-                const currency = data.country?.currency || 'USD';
-                const level = data.level || 'Unknown';
-                const cardType = data.cardType || 'Unknown';
-                const bankPhone = data.bankPhone;
-                const bankUrl = data.bankUrl;
+                const bank = data.bank || data.issuer || 'Unknown Bank';
+                const country = data.country?.name || data.country || 'Unknown';
+                const currency = data.country?.currency || data.currency || 'USD';
+                const level = data.level || data.scheme || 'Unknown';
+                const cardType = data.cardType || data.type || 'Unknown';
 
                 let resultHTML = `
                     <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${bin}</span></div>
@@ -768,20 +997,30 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                     resultHTML += `<div class="result-item"><span class="result-label">🏢 COMMERCIAL:</span><span class="result-value">${data.commercial ? 'YES' : 'NO'}</span></div>`;
                 }
 
-                if (bankPhone) {
-                    resultHTML += `<div class="result-item"><span class="result-label">📞 BANK PHONE:</span><span class="result-value">${bankPhone}</span></div>`;
+                if (data.bankPhone) {
+                    resultHTML += `<div class="result-item"><span class="result-label">📞 BANK PHONE:</span><span class="result-value">${data.bankPhone}</span></div>`;
                 }
 
-                if (bankUrl) {
-                    resultHTML += `<div class="result-item"><span class="result-label">🌐 BANK URL:</span><span class="result-value" style="font-size:0.7em;"><a href="${bankUrl}" target="_blank" style="color:#00ff88;">${bankUrl}</a></span></div>`;
+                if (data.bankUrl) {
+                    resultHTML += `<div class="result-item"><span class="result-label">🌐 BANK URL:</span><span class="result-value" style="font-size:0.7em;"><a href="${data.bankUrl}" target="_blank" style="color:#00ff88;">${data.bankUrl}</a></span></div>`;
+                }
+
+                // Luhn validation
+                const isValidLuhn = validateLuhn(binInput.padEnd(16, '0'));
+                resultHTML += `<div class="result-item"><span class="result-label">✓ LUHN CHECK:</span><span class="result-value" style="color:${isValidLuhn ? '#00ff88' : '#ff0088'}">${isValidLuhn ? 'VALID' : 'INVALID'}</span></div>`;
+
+                // Card range info
+                const cardLength = getExpectedCardLength(brand);
+                if (cardLength) {
+                    resultHTML += `<div class="result-item"><span class="result-label">📏 EXPECTED LENGTH:</span><span class="result-value">${cardLength} digits</span></div>`;
                 }
 
                 // Status footer
-                const statusColor = data.success ? '#00ff88' : '#ff8800';
-                const statusIcon = data.success ? '✅' : '⚠️';
+                const statusColor = data.success !== false ? '#00ff88' : '#ff8800';
+                const statusIcon = data.success !== false ? '✅' : '⚠️';
                 resultHTML += `
                     <div style="margin-top:20px;color:${statusColor};text-align:center;font-size:0.8em;">
-                        ${statusIcon} ${data.message || 'BIN lookup completed'}
+                        ${statusIcon} ${data.message || `BIN analysis completed using ${data.source || 'multiple sources'}`}
                     </div>
                 `;
 
@@ -790,6 +1029,142 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             } catch (err) {
                 resultContent.innerHTML = `<div class="error">🚨 BIN lookup failed: ${err.message}</div>`;
             }
+        }
+
+        // Enhanced BIN lookup with multiple sources
+        async function lookupBINMultiSource(bin) {
+            const sources = [
+                { name: 'API', url: `/api/bin/${bin}` },
+                { name: 'Local DB', url: null },
+                { name: 'BinList', url: `https://lookup.binlist.net/${bin}` },
+                { name: 'FreeBIN', url: `https://api.freebinchecker.com/bin/${bin}` }
+            ];
+
+            // Try local database first
+            const localResult = binDatabase[bin.slice(0, 6)];
+            if (localResult) {
+                return { ...localResult, success: true, source: 'Local Database' };
+            }
+
+            // Try external APIs
+            for (const source of sources) {
+                if (!source.url) continue;
+                
+                try {
+                    const res = await fetch(source.url, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'User-Agent': 'Cosmic-Card-Analyzer'
+                        }
+                    });
+                    
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.brand || data.scheme) {
+                            return { ...data, success: true, source: source.name };
+                        }
+                    }
+                } catch (error) {
+                    console.log(`${source.name} failed:`, error.message);
+                    continue;
+                }
+            }
+
+            // Fallback to pattern recognition
+            return recognizeCardFromPattern(bin);
+        }
+
+        // Pattern recognition for unknown BINs
+        function recognizeCardFromPattern(bin) {
+            const firstDigit = bin[0];
+            const firstTwo = bin.slice(0, 2);
+            const firstFour = bin.slice(0, 4);
+
+            if (firstDigit === '4') {
+                return {
+                    brand: 'Visa',
+                    bank: 'Unknown Visa Issuer',
+                    country: 'Unknown',
+                    level: 'Unknown',
+                    cardType: 'Credit/Debit',
+                    source: 'Pattern Recognition'
+                };
+            } else if (['51', '52', '53', '54', '55'].includes(firstTwo) || 
+                      (parseInt(firstFour) >= 2221 && parseInt(firstFour) <= 2720)) {
+                return {
+                    brand: 'Mastercard',
+                    bank: 'Unknown Mastercard Issuer',
+                    country: 'Unknown',
+                    level: 'Unknown',
+                    cardType: 'Credit/Debit',
+                    source: 'Pattern Recognition'
+                };
+            } else if (['34', '37'].includes(firstTwo)) {
+                return {
+                    brand: 'American Express',
+                    bank: 'American Express',
+                    country: 'Unknown',
+                    level: 'Unknown',
+                    cardType: 'Charge/Credit',
+                    source: 'Pattern Recognition'
+                };
+            } else if (bin.startsWith('6011') || bin.startsWith('65') || 
+                      (parseInt(firstFour) >= 6440 && parseInt(firstFour) <= 6499)) {
+                return {
+                    brand: 'Discover',
+                    bank: 'Discover Bank',
+                    country: 'US',
+                    level: 'Unknown',
+                    cardType: 'Credit',
+                    source: 'Pattern Recognition'
+                };
+            }
+
+            return {
+                brand: 'Unknown',
+                bank: 'Unknown Issuer',
+                country: 'Unknown',
+                level: 'Unknown',
+                cardType: 'Unknown',
+                success: false,
+                source: 'Pattern Recognition'
+            };
+        }
+
+        // Luhn algorithm validation
+        function validateLuhn(cardNumber) {
+            const digits = cardNumber.replace(/\D/g, '').split('').map(Number);
+            let sum = 0;
+            let isEven = false;
+
+            for (let i = digits.length - 1; i >= 0; i--) {
+                let digit = digits[i];
+
+                if (isEven) {
+                    digit *= 2;
+                    if (digit > 9) {
+                        digit -= 9;
+                    }
+                }
+
+                sum += digit;
+                isEven = !isEven;
+            }
+
+            return sum % 10 === 0;
+        }
+
+        // Get expected card length by brand
+        function getExpectedCardLength(brand) {
+            const lengths = {
+                'visa': '16',
+                'mastercard': '16',
+                'american express': '15',
+                'discover': '16',
+                'diners club': '14',
+                'jcb': '16'
+            };
+            return lengths[brand.toLowerCase()] || '13-19';
         }
 
         // =============== CARD TESTER (Stripe) ===============
@@ -847,8 +1222,25 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             }
         }
 
-        // =============== ENTRY MANAGER ===============
+        // =============== ENHANCED ENTRY MANAGER ===============
         
+        // View mode switching
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            document.querySelectorAll('.view-toggle').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (mode === 'table') {
+                document.getElementById('table-view').style.display = 'block';
+                document.getElementById('bank-view').style.display = 'none';
+                renderEntries();
+            } else {
+                document.getElementById('table-view').style.display = 'none';
+                document.getElementById('bank-view').style.display = 'block';
+                renderBankView();
+            }
+        }
+
         // Initialize Firebase connection
         async function initializeFirebase() {
             updateConnectionStatus('🔄 Connecting to Firebase...');
@@ -891,7 +1283,11 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                     });
                 });
                 
-                renderEntries();
+                if (currentViewMode === 'table') {
+                    renderEntries();
+                } else {
+                    renderBankView();
+                }
                 updateConnectionStatus(`🔥 Firebase connected - ${entries.length} entries loaded`);
             } catch (error) {
                 console.error('Error loading from Firebase:', error);
@@ -919,7 +1315,12 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                             added: data.added || (data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : new Date().toLocaleString())
                         });
                     });
-                    renderEntries();
+                    
+                    if (currentViewMode === 'table') {
+                        renderEntries();
+                    } else {
+                        renderBankView();
+                    }
                     updateConnectionStatus(`🔥 Firebase real-time active - ${entries.length} entries`);
                 });
             } catch (error) {
@@ -930,12 +1331,21 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
         // Load from localStorage (fallback)
         function loadEntriesFromLocal() {
             entries = JSON.parse(localStorage.getItem('cosmicEntries') || '[]');
-            renderEntries();
+            if (currentViewMode === 'table') {
+                renderEntries();
+            } else {
+                renderBankView();
+            }
             updateConnectionStatus('📱 Using local storage - Data saved locally only');
         }
 
-        // Save entry to Firebase or localStorage
+        // Enhanced save entry with bank detection
         async function saveEntry(entryData) {
+            // Detect bank from card number
+            if (entryData.cardNumber && !entryData.bank) {
+                entryData.bank = await detectBankFromBIN(entryData.cardNumber.slice(0, 6));
+            }
+
             if (isFirebaseConnected) {
                 try {
                     await window.firebaseUtils.addDoc(
@@ -958,6 +1368,16 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             }
         }
 
+        // Detect bank from BIN
+        async function detectBankFromBIN(bin) {
+            try {
+                const binData = await lookupBINMultiSource(bin);
+                return binData.bank || binData.issuer || 'Unknown Bank';
+            } catch (error) {
+                return 'Unknown Bank';
+            }
+        }
+
         function saveToLocal(entryData) {
             const entry = {
                 ...entryData,
@@ -966,7 +1386,12 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             };
             entries.unshift(entry); // Add to beginning
             localStorage.setItem('cosmicEntries', JSON.stringify(entries));
-            renderEntries();
+            
+            if (currentViewMode === 'table') {
+                renderEntries();
+            } else {
+                renderBankView();
+            }
         }
 
         // Update connection status
@@ -982,7 +1407,6 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
         async function updateEntryStatus(id, newStatus) {
             if (isFirebaseConnected) {
                 try {
-                    // For Firebase, we need to update the document
                     const docRef = window.firebaseUtils.doc(window.firebaseDB, 'cardEntries', id);
                     await window.firebaseUtils.updateDoc(docRef, { 
                         status: newStatus,
@@ -990,7 +1414,6 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                     });
                 } catch (error) {
                     console.error('Error updating status in Firebase:', error);
-                    // Fallback to local update
                     updateLocalEntryStatus(id, newStatus);
                 }
             } else {
@@ -1005,8 +1428,83 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                 entries[entryIndex].status = newStatus;
                 entries[entryIndex].lastUpdated = new Date().toLocaleString();
                 localStorage.setItem('cosmicEntries', JSON.stringify(entries));
-                renderEntries();
+                
+                if (currentViewMode === 'table') {
+                    renderEntries();
+                } else {
+                    renderBankView();
+                }
             }
+        }
+
+        // Delete entry
+        async function deleteEntry(id) {
+            if (!confirm('Are you sure you want to delete this entry?')) {
+                return;
+            }
+
+            if (isFirebaseConnected) {
+                try {
+                    await window.firebaseUtils.deleteDoc(
+                        window.firebaseUtils.doc(window.firebaseDB, 'cardEntries', id)
+                    );
+                } catch (error) {
+                    console.error('Error deleting from Firebase:', error);
+                    deleteLocalEntry(id);
+                }
+            } else {
+                deleteLocalEntry(id);
+            }
+        }
+
+        function deleteLocalEntry(id) {
+            entries = entries.filter(entry => entry.id !== id);
+            localStorage.setItem('cosmicEntries', JSON.stringify(entries));
+            selectedEntries.delete(id);
+            
+            if (currentViewMode === 'table') {
+                renderEntries();
+            } else {
+                renderBankView();
+            }
+        }
+
+        // Clear all data
+        async function clearAllData() {
+            if (!confirm('⚠️ This will delete ALL entries permanently. Are you sure?')) {
+                return;
+            }
+
+            if (isFirebaseConnected) {
+                try {
+                    const querySnapshot = await window.firebaseUtils.getDocs(
+                        window.firebaseUtils.collection(window.firebaseDB, 'cardEntries')
+                    );
+                    
+                    const deletePromises = [];
+                    querySnapshot.forEach((doc) => {
+                        deletePromises.push(window.firebaseUtils.deleteDoc(doc.ref));
+                    });
+                    
+                    await Promise.all(deletePromises);
+                    console.log('All Firebase entries deleted');
+                } catch (error) {
+                    console.error('Error clearing Firebase:', error);
+                }
+            }
+            
+            // Clear local storage too
+            localStorage.removeItem('cosmicEntries');
+            entries = [];
+            selectedEntries.clear();
+            
+            if (currentViewMode === 'table') {
+                renderEntries();
+            } else {
+                renderBankView();
+            }
+            
+            alert('All entries have been cleared');
         }
 
         // Bulk status update functions
@@ -1129,6 +1627,10 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             const expiry = document.getElementById('expiry').value.trim();
             const cvv = document.getElementById('cvv').value.trim();
             const zip = document.getElementById('zip').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const state = document.getElementById('state').value.trim();
             const status = document.getElementById('status').value || 'Unknown';
 
             if (!cardNumber) {
@@ -1141,23 +1643,26 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                 expiry: expiry,
                 cvv: cvv,
                 zip: zip,
+                name: name,
+                address: address,
+                city: city,
+                state: state,
                 status: status
             };
 
             await saveEntry(entryData);
 
             // Clear form
-            document.getElementById('card-number').value = '';
-            document.getElementById('expiry').value = '';
-            document.getElementById('cvv').value = '';
-            document.getElementById('zip').value = '';
+            ['card-number', 'expiry', 'cvv', 'zip', 'name', 'address', 'city', 'state'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
             document.getElementById('status').value = 'Unknown';
             
             // Hide form after adding
             document.getElementById('add-form').style.display = 'none';
         }
 
-        // Enhanced bulk entry processing
+        // Enhanced bulk entry processing with universal format detection
         async function addBulkEntries() {
             const bulkData = document.getElementById('bulk-data').value.trim();
             if (!bulkData) {
@@ -1170,13 +1675,17 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             let skippedCount = 0;
 
             for (const line of lines) {
-                const parsed = parseCardLine(line.trim());
+                const parsed = parseCardLineUniversal(line.trim());
                 if (parsed.cardNumber) {
                     const entryData = {
                         cardNumber: parsed.cardNumber,
                         expiry: parsed.expiry || '',
                         cvv: parsed.cvv || '',
                         zip: parsed.zip || '',
+                        name: parsed.name || '',
+                        address: parsed.address || '',
+                        city: parsed.city || '',
+                        state: parsed.state || '',
                         status: parsed.status || 'Unknown'
                     };
                     
@@ -1184,6 +1693,7 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                     addedCount++;
                 } else {
                     skippedCount++;
+                    console.log('Skipped line:', line);
                 }
             }
 
@@ -1197,74 +1707,59 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             alert(message);
         }
 
-        // Enhanced card line parser for multiple formats including full personal info
-        function parseCardLine(line) {
+        // Universal card line parser for any format
+        function parseCardLineUniversal(line) {
             // Remove extra whitespace and clean up the line
             line = line.replace(/\s+/g, ' ').trim();
             
-            // Remove any ** markers at the beginning or end
-            line = line.replace(/^\*\*|\*\*$/g, '').trim();
+            // Remove any ** markers, brackets, or other decorations
+            line = line.replace(/^\*\*|\*\*$|^\[|\]$|^-+|-+$/g, '').trim();
             
             let status = 'Unknown';
             let cardNumber = null;
             let expiry = '';
             let cvv = '';
             let zip = '';
+            let name = '';
+            let address = '';
+            let city = '';
+            let state = '';
             
-            // Check if line starts with a status (Live|, Dead|, Unknown|)
-            const statusMatch = line.match(/^(Live|Dead|Unknown)\|(.+)$/i);
+            // Check if line starts with a status (Live|, Dead|, Unknown|, etc.)
+            const statusMatch = line.match(/^(Live|Dead|Unknown|Valid|Invalid|Good|Bad|Working|Declined)\s*[\|\:\-\s]/i);
             if (statusMatch) {
-                status = statusMatch[1];
-                line = statusMatch[2];
+                status = statusMatch[1].toLowerCase() === 'good' || statusMatch[1].toLowerCase() === 'working' || statusMatch[1].toLowerCase() === 'valid' ? 'Live' : 
+                         statusMatch[1].toLowerCase() === 'bad' || statusMatch[1].toLowerCase() === 'declined' || statusMatch[1].toLowerCase() === 'invalid' ? 'Dead' : 
+                         statusMatch[1];
+                line = line.replace(statusMatch[0], '').trim();
             }
             
-            // Split by pipe characters for pipe-delimited formats
-            if (line.includes('|')) {
-                const parts = line.split('|').map(part => part.trim());
-                
-                if (parts.length >= 3) {
-                    // Basic format: cardNumber|expiry|cvv|... or full format with personal info
-                    cardNumber = parts[0].replace(/\D/g, '');
-                    
-                    // Handle different expiry formats
-                    let expiryPart = parts[1];
-                    if (expiryPart.length === 6) {
-                        // Format: MMYYYY -> MM/YY
-                        expiry = expiryPart.slice(0, 2) + '/' + expiryPart.slice(4, 6);
-                    } else if (expiryPart.length === 4) {
-                        // Format: MMYY -> MM/YY
-                        expiry = expiryPart.slice(0, 2) + '/' + expiryPart.slice(2, 4);
-                    } else if (expiryPart.includes('/')) {
-                        // Already formatted MM/YY
-                        expiry = expiryPart;
-                    } else {
-                        expiry = expiryPart;
-                    }
-                    
-                    cvv = parts[2];
-                    
-                    // If there are more parts, look for ZIP code
-                    // ZIP could be in various positions depending on format
-                    if (parts.length >= 4) {
-                        // For full format with name and address, ZIP is usually around position 7-8
-                        if (parts.length >= 8) {
-                            // Full format: card|expiry|cvv|name|address|city|state|zip|country|phone|email
-                            zip = parts[7] || '';
-                        } else {
-                            // Simple format: card|expiry|cvv|zip
-                            zip = parts[3] || '';
-                        }
+            // Try different delimiters: |, comma, space, tab, semicolon
+            const delimiters = ['|', ',', ';', '\t'];
+            let parts = null;
+            let usedDelimiter = null;
+            
+            for (const delimiter of delimiters) {
+                if (line.includes(delimiter)) {
+                    const testParts = line.split(delimiter).map(part => part.trim()).filter(part => part);
+                    if (testParts.length >= 3) { // At least card, expiry, cvv
+                        parts = testParts;
+                        usedDelimiter = delimiter;
+                        break;
                     }
                 }
-            } else {
-                // Try space-separated formats
+            }
+            
+            // If no delimiter worked, try space-separated
+            if (!parts) {
+                // Try to match common space-separated patterns
                 const spacePatterns = [
-                    // Format: 4111-1111-1111-1111 12/25 123 12345
-                    /^([\d\s\-]{13,25})\s+(\d{1,2}\/\d{2,4})\s+(\d{3,4})\s+(\d{5,10})$/,
-                    // Format: 4111 1111 1111 1111 12 25 123 12345
-                    /^([\d\s]{13,25})\s+(\d{1,2})\s+(\d{2,4})\s+(\d{3,4})\s+(\d{5,10})$/,
-                    // Just card number
-                    /^(\d{13,19})$/
+                    // Card MM YY CVV ZIP Name...
+                    /^([\d\s\-]{13,25})\s+(\d{1,2})\s+(\d{2,4})\s+(\d{3,4})\s+(\d{5,10})\s*(.*)$/,
+                    // Card MM/YY CVV ZIP Name...
+                    /^([\d\s\-]{13,25})\s+(\d{1,2}\/\d{2,4})\s+(\d{3,4})\s+(\d{5,10})\s*(.*)$/,
+                    // Card MM/YY CVV Name...
+                    /^([\d\s\-]{13,25})\s+(\d{1,2}\/\d{2,4})\s+(\d{3,4})\s+([A-Za-z\s]+.*)$/
                 ];
 
                 for (let pattern of spacePatterns) {
@@ -1277,15 +1772,21 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                                 expiry = match[2];
                             } else {
                                 // Handle MM YY format
-                                expiry = match[2] + '/' + (match[3] || '');
+                                expiry = match[2] + '/' + (match[3] || '').slice(-2);
                                 cvv = match[4] || '';
                                 zip = match[5] || '';
+                                name = match[6] || '';
                             }
                         }
                         
                         if (match[3] && match[2].includes('/')) {
                             cvv = match[3];
-                            zip = match[4] || '';
+                            if (match[4] && /^\d{5,10}$/.test(match[4])) {
+                                zip = match[4];
+                                name = match[5] || '';
+                            } else {
+                                name = match[4] || '';
+                            }
                         }
                         
                         break;
@@ -1293,18 +1794,168 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                 }
             }
 
+            // Process delimited data
+            if (parts && parts.length >= 3) {
+                cardNumber = parts[0].replace(/[\s\-]/g, '');
+                
+                // Handle different expiry formats
+                let expiryPart = parts[1];
+                if (expiryPart.length === 6 && /^\d{6}$/.test(expiryPart)) {
+                    // Format: MMYYYY -> MM/YY
+                    expiry = expiryPart.slice(0, 2) + '/' + expiryPart.slice(4, 6);
+                } else if (expiryPart.length === 4 && /^\d{4}$/.test(expiryPart)) {
+                    // Format: MMYY -> MM/YY
+                    expiry = expiryPart.slice(0, 2) + '/' + expiryPart.slice(2, 4);
+                } else if (expiryPart.includes('/')) {
+                    // Already formatted MM/YY or MM/YYYY
+                    const dateParts = expiryPart.split('/');
+                    if (dateParts[1] && dateParts[1].length === 4) {
+                        expiry = dateParts[0] + '/' + dateParts[1].slice(-2);
+                    } else {
+                        expiry = expiryPart;
+                    }
+                } else {
+                    expiry = expiryPart;
+                }
+                
+                cvv = parts[2];
+                
+                // Determine remaining fields based on data patterns
+                if (parts.length >= 4) {
+                    let remainingParts = parts.slice(3);
+                    let currentIndex = 0;
+                    
+                    // Look for ZIP code (5-10 digits)
+                    for (let i = 0; i < remainingParts.length; i++) {
+                        if (/^\d{5,10}$/.test(remainingParts[i])) {
+                            zip = remainingParts[i];
+                            remainingParts.splice(i, 1);
+                            break;
+                        }
+                    }
+                    
+                    // Look for state code (2 letters)
+                    for (let i = 0; i < remainingParts.length; i++) {
+                        if (/^[A-Z]{2}$/i.test(remainingParts[i])) {
+                            state = remainingParts[i].toUpperCase();
+                            remainingParts.splice(i, 1);
+                            break;
+                        }
+                    }
+                    
+                    // Remaining logic for name, address, city
+                    if (remainingParts.length >= 1) {
+                        // First remaining part is likely name
+                        name = remainingParts[0];
+                        
+                        if (remainingParts.length >= 2) {
+                            // Second part is likely address
+                            address = remainingParts[1];
+                            
+                            if (remainingParts.length >= 3) {
+                                // Third part is likely city
+                                city = remainingParts[2];
+                            }
+                        }
+                    }
+                }
+            }
+
             // Validate card number
-            if (cardNumber && cardNumber.length >= 13 && cardNumber.length <= 19) {
+            if (cardNumber && cardNumber.length >= 13 && cardNumber.length <= 19 && /^\d+$/.test(cardNumber)) {
                 return { 
                     cardNumber, 
-                    expiry: expiry.replace(/\D/g, '').length >= 4 ? expiry : '', 
+                    expiry: expiry.replace(/[^\d\/]/g, ''), 
                     cvv: cvv.replace(/\D/g, ''), 
                     zip: zip.replace(/\D/g, ''), 
+                    name: name.replace(/[^\w\s\.\-\']/g, '').trim(),
+                    address: address.replace(/[^\w\s\.\-\'#]/g, '').trim(),
+                    city: city.replace(/[^\w\s\.\-\']/g, '').trim(),
+                    state: state.toUpperCase(),
                     status 
                 };
             }
 
             return { cardNumber: null };
+        }
+
+        // Edit entry functions
+        function editEntry(id) {
+            const entry = entries.find(e => e.id === id);
+            if (!entry) return;
+
+            currentEditId = id;
+            
+            // Populate edit form
+            document.getElementById('edit-card-number').value = entry.cardNumber || '';
+            document.getElementById('edit-expiry').value = entry.expiry || '';
+            document.getElementById('edit-cvv').value = entry.cvv || '';
+            document.getElementById('edit-zip').value = entry.zip || '';
+            document.getElementById('edit-name').value = entry.name || '';
+            document.getElementById('edit-address').value = entry.address || '';
+            document.getElementById('edit-city').value = entry.city || '';
+            document.getElementById('edit-state').value = entry.state || '';
+            document.getElementById('edit-status').value = entry.status || 'Unknown';
+            
+            // Show modal
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            currentEditId = null;
+        }
+
+        async function saveEditedEntry() {
+            if (!currentEditId) return;
+
+            const updatedData = {
+                cardNumber: document.getElementById('edit-card-number').value.trim().replace(/\s/g, ''),
+                expiry: document.getElementById('edit-expiry').value.trim(),
+                cvv: document.getElementById('edit-cvv').value.trim(),
+                zip: document.getElementById('edit-zip').value.trim(),
+                name: document.getElementById('edit-name').value.trim(),
+                address: document.getElementById('edit-address').value.trim(),
+                city: document.getElementById('edit-city').value.trim(),
+                state: document.getElementById('edit-state').value.trim(),
+                status: document.getElementById('edit-status').value
+            };
+
+            // Detect bank if card number changed
+            if (updatedData.cardNumber) {
+                updatedData.bank = await detectBankFromBIN(updatedData.cardNumber.slice(0, 6));
+            }
+
+            if (isFirebaseConnected) {
+                try {
+                    const docRef = window.firebaseUtils.doc(window.firebaseDB, 'cardEntries', currentEditId);
+                    await window.firebaseUtils.updateDoc(docRef, {
+                        ...updatedData,
+                        lastUpdated: window.firebaseUtils.serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error('Error updating entry in Firebase:', error);
+                    updateLocalEntry(currentEditId, updatedData);
+                }
+            } else {
+                updateLocalEntry(currentEditId, updatedData);
+            }
+
+            closeEditModal();
+        }
+
+        function updateLocalEntry(id, updatedData) {
+            const entryIndex = entries.findIndex(entry => entry.id === id);
+            if (entryIndex !== -1) {
+                entries[entryIndex] = { ...entries[entryIndex], ...updatedData, lastUpdated: new Date().toLocaleString() };
+                localStorage.setItem('cosmicEntries', JSON.stringify(entries));
+                
+                if (currentViewMode === 'table') {
+                    renderEntries();
+                } else {
+                    renderBankView();
+                }
+            }
         }
 
         // Refresh data
@@ -1323,8 +1974,8 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                 return;
             }
 
-            const csv = 'Card Number,Expiry,CVV,ZIP,Status,Added\n' + 
-                       entries.map(e => `${e.cardNumber},${e.expiry},${e.cvv},${e.zip},${e.status},${e.added}`).join('\n');
+            const csv = 'Card Number,Expiry,CVV,ZIP,Name,Address,City,State,Bank,Status,Added\n' + 
+                       entries.map(e => `${e.cardNumber},${e.expiry},${e.cvv},${e.zip},"${e.name || ''}","${e.address || ''}","${e.city || ''}",${e.state || ''},${e.bank || ''},${e.status},${e.added}`).join('\n');
             
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -1345,7 +1996,7 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             if (entries.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align: center; color: #00ccff; padding: 30px;">
+                        <td colspan="11" style="text-align: center; color: #00ccff; padding: 30px;">
                             📭 No entries yet. Add some cards to get started!
                         </td>
                     </tr>
@@ -1364,16 +2015,141 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
                     <td>${entry.expiry}</td>
                     <td>${entry.cvv}</td>
                     <td>${entry.zip}</td>
+                    <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis;">${entry.name || ''}</td>
+                    <td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">${entry.address || ''}</td>
+                    <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis;">${entry.bank || 'Unknown'}</td>
                     <td class="status-cell" onclick="editStatus('${entry.id}', this)">
                         <span style="color: ${getStatusColor(entry.status)}">${entry.status}</span>
                         <span class="edit-icon">✏️</span>
                     </td>
-                    <td style="font-size: 0.7em;">${formatDate(entry.added)}</td>
+                    <td style="font-size: 0.6em;">${formatDate(entry.added)}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editEntry('${entry.id}')">✏️</button>
+                        <button class="action-btn delete-btn" onclick="deleteEntry('${entry.id}')">🗑️</button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
 
             document.getElementById('select-all-checkbox').checked = false;
+        }
+
+        // Render bank view
+        function renderBankView() {
+            const bankSections = document.getElementById('bank-sections');
+            bankSections.innerHTML = '';
+
+            if (entries.length === 0) {
+                bankSections.innerHTML = `
+                    <div style="text-align: center; color: #00ccff; padding: 50px;">
+                        📭 No entries yet. Add some cards to get started!
+                    </div>
+                `;
+                return;
+            }
+
+            // Group entries by bank
+            const bankGroups = {};
+            entries.forEach(entry => {
+                const bank = entry.bank || 'Unknown Bank';
+                if (!bankGroups[bank]) {
+                    bankGroups[bank] = [];
+                }
+                bankGroups[bank].push(entry);
+            });
+
+            // Sort banks by entry count
+            const sortedBanks = Object.keys(bankGroups).sort((a, b) => bankGroups[b].length - bankGroups[a].length);
+
+            sortedBanks.forEach((bank, index) => {
+                const bankEntries = bankGroups[bank];
+                const liveCount = bankEntries.filter(e => e.status === 'Live').length;
+                const deadCount = bankEntries.filter(e => e.status === 'Dead').length;
+                const unknownCount = bankEntries.filter(e => e.status === 'Unknown').length;
+
+                const bankSection = document.createElement('div');
+                bankSection.className = 'bank-section';
+                bankSection.innerHTML = `
+                    <div class="bank-header" onclick="toggleBankSection(${index})">
+                        <span>🏦 ${bank} (${bankEntries.length})</span>
+                        <span style="font-size: 0.8em;">
+                            <span style="color: #00ff88;">Live: ${liveCount}</span> |
+                            <span style="color: #ff0088;">Dead: ${deadCount}</span> |
+                            <span style="color: #00ccff;">Unknown: ${unknownCount}</span>
+                            <span id="bank-toggle-${index}">▼</span>
+                        </span>
+                    </div>
+                    <div class="bank-content" id="bank-content-${index}">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" onchange="toggleBankSelectAll(${index}, this)"></th>
+                                        <th>Card Number</th>
+                                        <th>Exp</th>
+                                        <th>CVV</th>
+                                        <th>ZIP</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${bankEntries.map(entry => `
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="entry-checkbox bank-${index}" value="${entry.id}" 
+                                                       onchange="toggleEntrySelection('${entry.id}', this)">
+                                            </td>
+                                            <td>${maskCardNumber(entry.cardNumber)}</td>
+                                            <td>${entry.expiry}</td>
+                                            <td>${entry.cvv}</td>
+                                            <td>${entry.zip}</td>
+                                            <td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">${entry.name || ''}</td>
+                                            <td class="status-cell" onclick="editStatus('${entry.id}', this)">
+                                                <span style="color: ${getStatusColor(entry.status)}">${entry.status}</span>
+                                                <span class="edit-icon">✏️</span>
+                                            </td>
+                                            <td>
+                                                <button class="action-btn edit-btn" onclick="editEntry('${entry.id}')">✏️</button>
+                                                <button class="action-btn delete-btn" onclick="deleteEntry('${entry.id}')">🗑️</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                bankSections.appendChild(bankSection);
+            });
+        }
+
+        function toggleBankSection(index) {
+            const content = document.getElementById(`bank-content-${index}`);
+            const toggle = document.getElementById(`bank-toggle-${index}`);
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                toggle.textContent = '▶';
+            }
+        }
+
+        function toggleBankSelectAll(bankIndex, checkbox) {
+            const bankCheckboxes = document.querySelectorAll(`.bank-${bankIndex}`);
+            
+            bankCheckboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+                if (checkbox.checked) {
+                    selectedEntries.add(cb.value);
+                } else {
+                    selectedEntries.delete(cb.value);
+                }
+            });
+            updateSelectionUI();
         }
 
         // Edit status inline
@@ -1398,12 +2174,20 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             };
             
             select.onblur = function() {
-                renderEntries();
+                if (currentViewMode === 'table') {
+                    renderEntries();
+                } else {
+                    renderBankView();
+                }
             };
             
             select.onkeydown = function(e) {
                 if (e.key === 'Escape') {
-                    renderEntries();
+                    if (currentViewMode === 'table') {
+                        renderEntries();
+                    } else {
+                        renderBankView();
+                    }
                 } else if (e.key === 'Enter') {
                     select.blur();
                 }
@@ -1454,7 +2238,7 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
 
         // Initialize app
         window.initApp = function() {
-            console.log('🚀 Initializing Cosmic Card Analyzer...');
+            console.log('🚀 Initializing Enhanced Cosmic Card Analyzer...');
             createStars();
             initializeFirebase();
             
@@ -1467,27 +2251,92 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
 
         // Auto-format inputs
         document.addEventListener('DOMContentLoaded', () => {
-            const expiryInput = document.getElementById('expiry');
-            if (expiryInput) {
-                expiryInput.addEventListener('input', function(e) {
+            // Format expiry inputs
+            ['expiry', 'edit-expiry'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value.length >= 2) {
+                            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                        }
+                        e.target.value = value;
+                    });
+                }
+            });
+
+            // Format card number inputs
+            ['card-number', 'edit-card-number'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        let value = e.target.value.replace(/\D/g, '');
+                        value = value.substring(0, 19);
+                        value = value.replace(/(.{4})/g, '$1 ').trim();
+                        e.target.value = value;
+                    });
+                }
+            });
+
+            // Format CVV inputs
+            ['cvv', 'edit-cvv'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+                    });
+                }
+            });
+
+            // Format ZIP inputs
+            ['zip', 'edit-zip'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 10);
+                    });
+                }
+            });
+
+            // Format state inputs
+            ['state', 'edit-state'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 2);
+                    });
+                }
+            });
+
+            // Format BIN input
+            const binInput = document.getElementById('bin-input');
+            if (binInput) {
+                binInput.addEventListener('input', function(e) {
                     let value = e.target.value.replace(/\D/g, '');
-                    if (value.length >= 2) {
-                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    value = value.substring(0, 19);
+                    if (value.length > 4) {
+                        value = value.replace(/(.{4})/g, '$1 ').trim();
                     }
                     e.target.value = value;
                 });
-            }
 
-            const cardInput = document.getElementById('card-number');
-            if (cardInput) {
-                cardInput.addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, '');
-                    value = value.substring(0, 19);
-                    value = value.replace(/(.{4})/g, '$1 ').trim();
-                    e.target.value = value;
+                // Allow Enter key to trigger analysis
+                binInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        analyzeCard();
+                    }
                 });
             }
 
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('edit-modal');
+                if (event.target == modal) {
+                    closeEditModal();
+                }
+            };
+
+            // Initialize if Firebase is already loaded
             if (window.firebaseDB) {
                 window.initApp();
             }
@@ -1502,13 +2351,13 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
 
         // Add touch feedback for buttons
         document.addEventListener('touchstart', function(e) {
-            if (e.target.matches('.btn, .nav-btn, .controls button')) {
+            if (e.target.matches('.btn, .nav-btn, .controls button, .action-btn')) {
                 e.target.style.transform = 'scale(0.95)';
             }
         });
 
         document.addEventListener('touchend', function(e) {
-            if (e.target.matches('.btn, .nav-btn, .controls button')) {
+            if (e.target.matches('.btn, .nav-btn, .controls button, .action-btn')) {
                 setTimeout(() => {
                     e.target.style.transform = '';
                 }, 150);
@@ -1524,6 +2373,70 @@ Live|4388540042977966|042029|800|Heather Karp|3 Boston Way|Newburyport|MA|01950|
             }
             lastTouchEnd = now;
         }, false);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + E to export data
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                if (document.getElementById('manager').classList.contains('active')) {
+                    exportData();
+                }
+            }
+            
+            // Ctrl/Cmd + A to add new entry
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+                e.preventDefault();
+                if (document.getElementById('manager').classList.contains('active')) {
+                    showAddForm();
+                }
+            }
+            
+            // Ctrl/Cmd + B to show bulk form
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                e.preventDefault();
+                if (document.getElementById('manager').classList.contains('active')) {
+                    showBulkForm();
+                }
+            }
+            
+            // Escape to close modals/forms
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('edit-modal');
+                if (modal.style.display === 'block') {
+                    closeEditModal();
+                } else {
+                    document.getElementById('add-form').style.display = 'none';
+                    document.getElementById('bulk-form').style.display = 'none';
+                }
+            }
+        });
+
+        // Enhanced error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            
+            // Show user-friendly error for critical failures
+            if (e.error && e.error.message.includes('Firebase')) {
+                updateConnectionStatus('❌ Firebase connection lost - Using local storage');
+                isFirebaseConnected = false;
+                loadEntriesFromLocal();
+            }
+        });
+
+        // Service Worker registration for offline support (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+        console.log('🎯 Enhanced Cosmic Card Analyzer loaded successfully!');
+        console.log('📋 Features: Enhanced BIN lookup, Universal parsing, Bank grouping, Edit/Delete');
     </script>
 </body>
 </html>
