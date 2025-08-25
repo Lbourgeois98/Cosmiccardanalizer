@@ -1026,77 +1026,44 @@ Mixed formats OK - will auto-detect structure"></textarea>
 
         // Enhanced BIN database for better card analysis and bank detection
         const binDatabase = {
-  "400344": { brand: "Visa", bank: "Chase Bank", country: "US", level: "Classic", cardType: "Credit" },
-  "401288": { brand: "Visa", bank: "Bank of America", country: "US", level: "Platinum", cardType: "Credit" },
-  "403619": { brand: "Visa", bank: "Wells Fargo", country: "US", level: "Gold", cardType: "Credit" },
-  "405209": { brand: "Visa", bank: "Citibank", country: "US", level: "Signature", cardType: "Credit" },
-  "411111": { brand: "Visa", bank: "Test BIN (General)", country: "US", level: "Classic", cardType: "Credit" },
-  "414709": { brand: "Visa", bank: "Bank of America", country: "US", level: "Classic", cardType: "Credit" },
-  "414720": { brand: "Visa", bank: "Chase Bank", country: "US", level: "Platinum", cardType: "Credit" },
-  "414737": { brand: "Visa", bank: "Boeing Employees Credit Union (BECU)", country: "US", level: "Classic", cardType: "Debit" },
-  "426684": { brand: "Visa", bank: "Chase Bank", country: "US", level: "Infinite", cardType: "Credit" },
-  "431307": { brand: "Visa", bank: "Citibank", country: "US", level: "Gold", cardType: "Credit" },
-  "434256": { brand: "Visa", bank: "Wells Fargo", country: "US", level: "Classic", cardType: "Debit" },
-  "438857": { brand: "Visa", bank: "Chase Bank", country: "US", level: "Business", cardType: "Credit" },
-  "440066": { brand: "Visa", bank: "Bank of America", country: "US", level: "Platinum", cardType: "Debit" },
-  "441103": { brand: "Visa", bank: "US Bank", country: "US", level: "Classic", cardType: "Credit" },
-  "446203": { brand: "Visa", bank: "PNC Bank", country: "US", level: "Gold", cardType: "Credit" },
-  "449533": { brand: "Visa", bank: "TD Bank", country: "US", level: "Classic", cardType: "Debit" },
-  "450003": { brand: "Visa", bank: "Bank of America", country: "US", level: "Signature", cardType: "Credit" },
-  "464018": { brand: "Visa", bank: "Wells Fargo", country: "US", level: "Platinum", cardType: "Credit" },
-  "471625": { brand: "Visa", bank: "Capital One", country: "US", level: "Classic", cardType: "Credit" },
-  "473702": { brand: "Visa", bank: "USAA", country: "US", level: "Gold", cardType: "Credit" },
-  "473700": { brand: "Visa", bank: "Pentagon Federal Credit Union (PenFed)", country: "US", level: "Platinum", cardType: "Credit" },
-  "479213": { brand: "Visa", bank: "SunTrust Bank", country: "US", level: "Business", cardType: "Credit" },
-  "480011": { brand: "Visa", bank: "Navy Federal Credit Union", country: "US", level: "Classic", cardType: "Debit" },
-  "480213": { brand: "Visa", bank: "Navy Federal Credit Union", country: "US", level: "Platinum", cardType: "Credit" },
-  "510510": { brand: "Mastercard", bank: "Bank of America", country: "US", level: "Standard", cardType: "Credit" },
-  "512107": { brand: "Mastercard", bank: "Chase Bank", country: "US", level: "World", cardType: "Credit" },
-  "514040": { brand: "Mastercard", bank: "Citibank", country: "US", level: "Platinum", cardType: "Credit" },
-  "517805": { brand: "Mastercard", bank: "Navy Federal Credit Union", country: "US", level: "World Elite", cardType: "Credit" },
-  "521729": { brand: "Mastercard", bank: "Capital One", country: "US", level: "Standard", cardType: "Credit" },
-  "526225": { brand: "Mastercard", bank: "Wells Fargo", country: "US", level: "World Elite", cardType: "Credit" },
-  "531690": { brand: "Mastercard", bank: "US Bank", country: "US", level: "Platinum", cardType: "Debit" },
-  "542418": { brand: "Mastercard", bank: "PNC Bank", country: "US", level: "Standard", cardType: "Credit" },
-  "546616": { brand: "Mastercard", bank: "Citibank", country: "US", level: "World", cardType: "Credit" },
-  "549123": { brand: "Mastercard", bank: "Bank of America", country: "US", level: "Platinum", cardType: "Credit" },
-  "552433": { brand: "Mastercard", bank: "Chase Bank", country: "US", level: "World Elite", cardType: "Credit" },
-  "554433": { brand: "Mastercard", bank: "State Employees Credit Union (SECU)", country: "US", level: "Standard", cardType: "Debit" },
-  "601100": { brand: "Discover", bank: "Discover Bank", country: "US", level: "Standard", cardType: "Credit" },
-  "601111": { brand: "Discover", bank: "Discover Bank", country: "US", level: "Miles", cardType: "Credit" },
-  "644000": { brand: "Discover", bank: "Discover Bank", country: "US", level: "Cashback", cardType: "Credit" },
-  "371449": { brand: "American Express", bank: "American Express", country: "US", level: "Platinum", cardType: "Credit" },
-  "374200": { brand: "American Express", bank: "American Express", country: "US", level: "Gold", cardType: "Credit" },
-  "378282": { brand: "American Express", bank: "American Express", country: "US", level: "Centurion", cardType: "Credit" },
-  "424631": { brand: "Visa", bank: "Golden 1 Credit Union", country: "US", level: "Classic", cardType: "Credit" },
-  "473099": { brand: "Visa", bank: "SchoolsFirst Federal Credit Union", country: "US", level: "Platinum", cardType: "Credit" },
-  "541065": { brand: "Mastercard", bank: "Alliant Credit Union", country: "US", level: "World", cardType: "Credit" },
-  "549035": { brand: "Mastercard", bank: "Digital Federal Credit Union (DCU)", country: "US", level: "Standard", cardType: "Debit" },
-
-  // --- First National Bank and Trust ---
-  "406062": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Credit" },
-  "419089": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Debit" },
-  "420739": { brand: "Visa", bank: "First National Bank and Trust", country: "India", level: "Classic", cardType: "Credit" },
-  "422412": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Debit" },
-  "422480": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Debit" },
-  "426296": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Gold Premium", cardType: "Debit" },
-  "442717": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Debit" },
-  "447303": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Business", cardType: "Debit" },
-  "449822": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Credit" },
-  "463114": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Debit" },
-  "464735": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Classic", cardType: "Debit" },
-  "464736": { brand: "Visa", bank: "First National Bank and Trust", country: "US", level: "Premier", cardType: "Debit" },
-
-  // --- First National Bank ---
-  "559384": { brand: "Mastercard", bank: "First National Bank", country: "US", level: "Business", cardType: "Debit" },
-  "525774": { brand: "Mastercard", bank: "First National Bank", country: "US", level: "Gold", cardType: "Credit" },
-  "524897": { brand: "Mastercard", bank: "First National Bank", country: "US", level: "Standard", cardType: "Credit" },
-  "517081": { brand: "Mastercard", bank: "First National Bank", country: "US", level: "Enhanced", cardType: "Debit" },
-  "491072": { brand: "Visa", bank: "First National Bank", country: "US", level: "Prepaid", cardType: "Debit" },
-  "406368": { brand: "Visa", bank: "First National Bank", country: "US", level: "Business", cardType: "Debit" },
-  "404699": { brand: "Visa", bank: "First National Bank", country: "US", level: "Classic", cardType: "Debit" }
-};
-</script>
+            // Visa
+            '400000': { brand: 'Visa', bank: 'Visa Test Card', country: 'US', level: 'Classic', cardType: 'Debit' },
+            '401288': { brand: 'Visa', bank: 'Bank of America', country: 'US', level: 'Gold', cardType: 'Credit' },
+            '411111': { brand: 'Visa', bank: 'Visa Test Card', country: 'US', level: 'Classic', cardType: 'Credit' },
+            '424242': { brand: 'Visa', bank: 'Stripe Test Card', country: 'US', level: 'Classic', cardType: 'Credit' },
+            '440000': { brand: 'Visa', bank: 'Chase Bank', country: 'US', level: 'Platinum', cardType: 'Credit' },
+            '474426': { brand: 'Visa', bank: 'Wells Fargo', country: 'US', level: 'Classic', cardType: 'Debit' },
+            '450000': { brand: 'Visa', bank: 'Bank of America', country: 'US', level: 'Classic', cardType: 'Credit' },
+            '454742': { brand: 'Visa', bank: 'Chase', country: 'US', level: 'Signature', cardType: 'Credit' },
+            '476173': { brand: 'Visa', bank: 'Citibank', country: 'US', level: 'Platinum', cardType: 'Credit' },
+            '438854': { brand: 'Visa', bank: 'Wells Fargo', country: 'US', level: 'Rewards', cardType: 'Credit' },
+            
+            // Mastercard  
+            '222100': { brand: 'Mastercard', bank: 'Capital One', country: 'US', level: 'World', cardType: 'Credit' },
+            '510000': { brand: 'Mastercard', bank: 'Mastercard Test', country: 'US', level: 'Standard', cardType: 'Credit' },
+            '555555': { brand: 'Mastercard', bank: 'Mastercard Test', country: 'US', level: 'World Elite', cardType: 'Credit' },
+            '540988': { brand: 'Mastercard', bank: 'Citibank', country: 'US', level: 'World', cardType: 'Credit' },
+            '547020': { brand: 'Mastercard', bank: 'Bank of America', country: 'US', level: 'Platinum', cardType: 'Credit' },
+            '531100': { brand: 'Mastercard', bank: 'Capital One', country: 'US', level: 'World', cardType: 'Credit' },
+            '524631': { brand: 'Mastercard', bank: 'Chase', country: 'US', level: 'World', cardType: 'Credit' },
+            '552426': { brand: 'Mastercard', bank: 'Wells Fargo', country: 'US', level: 'World', cardType: 'Credit' },
+            
+            // American Express
+            '340000': { brand: 'American Express', bank: 'American Express', country: 'US', level: 'Gold', cardType: 'Charge' },
+            '370000': { brand: 'American Express', bank: 'American Express', country: 'US', level: 'Platinum', cardType: 'Charge' },
+            '378282': { brand: 'American Express', bank: 'American Express Test', country: 'US', level: 'Green', cardType: 'Charge' },
+            '371449': { brand: 'American Express', bank: 'American Express', country: 'US', level: 'Platinum', cardType: 'Charge' },
+            
+            // Discover
+            '601100': { brand: 'Discover', bank: 'Discover Bank', country: 'US', level: 'Classic', cardType: 'Credit' },
+            '622126': { brand: 'Discover', bank: 'Discover Bank', country: 'US', level: 'Platinum', cardType: 'Credit' },
+            '644225': { brand: 'Discover', bank: 'Discover Bank', country: 'US', level: 'Cash Rewards', cardType: 'Credit' },
+            
+            // Popular bank BINs
+            '474476': { brand: 'Visa', bank: 'Wells Fargo', country: 'US', level: 'Propel', cardType: 'Credit' },
+            '474747': { brand: 'Visa', bank: 'Bank of America', country: 'US', level: 'Travel Rewards', cardType: 'Credit' },
+            '524645': { brand: 'Mastercard', bank: 'JPMorgan Chase', country: 'US', level: 'Sapphire', cardType: 'Credit' },
+            '540418': { brand: 'Mastercard', bank: 'Citibank', country: 'US', level: 'Double Cash', cardType: 'Credit' }
         };
 
         // Navigation
@@ -1134,13 +1101,13 @@ Mixed formats OK - will auto-detect structure"></textarea>
                 const cardType = data.cardType || data.type || 'Unknown';
 
                 let resultHTML = `
-                    <div class="result-item"><span class="result-label"> BIN:</span><span class="result-value">${bin}</span></div>
-                    <div class="result-item"><span class="result-label"> BRAND:</span><span class="result-value">${brand.toUpperCase()}</span></div>
-                    <div class="result-item"><span class="result-label"> BANK:</span><span class="result-value">${bank}</span></div>
-                    <div class="result-item"><span class="result-label"> COUNTRY:</span><span class="result-value">${country}</span></div>
-                    <div class="result-item"><span class="result-label"> CURRENCY:</span><span class="result-value">${currency}</span></div>
-                    <div class="result-item"><span class="result-label"> LEVEL:</span><span class="result-value">${level.toUpperCase()}</span></div>
-                    <div class="result-item"><span class="result-label"> TYPE:</span><span class="result-value">${cardType.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">🔢 BIN:</span><span class="result-value">${bin}</span></div>
+                    <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${brand.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">🏦 BANK:</span><span class="result-value">${bank}</span></div>
+                    <div class="result-item"><span class="result-label">🌍 COUNTRY:</span><span class="result-value">${country}</span></div>
+                    <div class="result-item"><span class="result-label">💵 CURRENCY:</span><span class="result-value">${currency}</span></div>
+                    <div class="result-item"><span class="result-label">⭐ LEVEL:</span><span class="result-value">${level.toUpperCase()}</span></div>
+                    <div class="result-item"><span class="result-label">🔍 TYPE:</span><span class="result-value">${cardType.toUpperCase()}</span></div>
                 `;
 
                 // Add additional info if available
@@ -1342,11 +1309,11 @@ Mixed formats OK - will auto-detect structure"></textarea>
 
                 if (paymentIntent.status === 'succeeded') {
                     resultContent.innerHTML = `
-                        <div class="result-item"><span class="result-label"> CARD VALID:</span><span class="result-value" style="color:#00ff88;">YES ✅</span></div>
-                        <div class="result-item"><span class="result-label"> BRAND:</span><span class="result-value">${paymentIntent.payment_method_details.card.brand.toUpperCase()}</span></div>
-                        <div class="result-item"><span class="result-label"> LAST 4:</span><span class="result-value">${paymentIntent.payment_method_details.card.last4}</span></div>
-                        <div class="result-item"><span class="result-label"> AMOUNT:</span><span class="result-value">$0.50</span></div>
-                        <div class="result-item"><span class="result-label"> ID:</span><span class="result-value" style="font-size:0.7em;">${paymentIntent.id}</span></div>
+                        <div class="result-item"><span class="result-label">✅ CARD VALID:</span><span class="result-value" style="color:#00ff88;">YES ✅</span></div>
+                        <div class="result-item"><span class="result-label">💳 BRAND:</span><span class="result-value">${paymentIntent.payment_method_details.card.brand.toUpperCase()}</span></div>
+                        <div class="result-item"><span class="result-label">🔢 LAST 4:</span><span class="result-value">${paymentIntent.payment_method_details.card.last4}</span></div>
+                        <div class="result-item"><span class="result-label">💸 AMOUNT:</span><span class="result-value">$0.50</span></div>
+                        <div class="result-item"><span class="result-label">🆔 ID:</span><span class="result-value" style="font-size:0.7em;">${paymentIntent.id}</span></div>
                         <div style="margin-top:15px;color:#00ccff;text-align:center;">
                             🟢 Transaction succeeded! Card is valid.
                         </div>
@@ -1380,7 +1347,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
 
         // Initialize Firebase connection
         async function initializeFirebase() {
-            updateConnectionStatus(' Connecting to Firebase...');
+            updateConnectionStatus('🔄 Connecting to Firebase...');
             
             try {
                 if (window.firebaseDB && window.firebaseUtils) {
@@ -1401,7 +1368,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
         // Load entries from Firebase
         async function loadEntriesFromFirebase() {
             try {
-                updateConnectionStatus(' Loading data from Firebase...');
+                updateConnectionStatus('🔄 Loading data from Firebase...');
                 
                 const q = window.firebaseUtils.query(
                     window.firebaseUtils.collection(window.firebaseDB, 'cardEntries'),
@@ -1425,10 +1392,10 @@ Mixed formats OK - will auto-detect structure"></textarea>
                 } else {
                     renderBINView();
                 }
-                updateConnectionStatus(` Firebase connected - ${entries.length} entries loaded`);
+                updateConnectionStatus(`🔥 Firebase connected - ${entries.length} entries loaded`);
             } catch (error) {
                 console.error('Error loading from Firebase:', error);
-                updateConnectionStatus(' Firebase error - Using local storage');
+                updateConnectionStatus('❌ Firebase error - Using local storage');
                 isFirebaseConnected = false;
                 loadEntriesFromLocal();
             }
@@ -1458,7 +1425,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
                     } else {
                         renderBINView();
                     }
-                    updateConnectionStatus(` Firebase real-time active - ${entries.length} entries`);
+                    updateConnectionStatus(`🔥 Firebase real-time active - ${entries.length} entries`);
                 });
             } catch (error) {
                 console.error('Real-time listener error:', error);
@@ -1473,7 +1440,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
             } else {
                 renderBINView();
             }
-            updateConnectionStatus(' Using local storage - Data saved locally only');
+            updateConnectionStatus('📱 Using local storage - Data saved locally only');
         }
 
         // Enhanced save entry with BIN detection
@@ -1657,7 +1624,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
             }
 
             const entryData = {
-                cardNumber: cardNumber,
+                cardNumber: cardNumber.replace(/\s/g, ''),
                 expiry: expiry,
                 cvv: cvv,
                 zip: zip,
@@ -1843,7 +1810,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
             if (entries.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; color: #00ccff; padding: 40px 20px; background: rgba(0, 204, 255, 0.05); border-radius: 12px; border: 1px solid rgba(0, 204, 255, 0.2);">
-                        <div style="font-size: 2em; margin-bottom: 10px;"></div>
+                        <div style="font-size: 2em; margin-bottom: 10px;">📭</div>
                         <div style="font-size: 0.9em; margin-bottom: 8px;">No cards yet!</div>
                         <div style="font-size: 0.7em; opacity: 0.8;">Tap "Add" to get started</div>
                     </div>
@@ -1859,19 +1826,19 @@ Mixed formats OK - will auto-detect structure"></textarea>
                            onchange="toggleEntrySelection('${entry.id}', this)">
                     <div class="card-content">
                         <div class="card-header">
-                            <div class="card-number-display">${entry.cardNumber}</div>
+                            <div class="card-number-display">${maskCardNumber(entry.cardNumber)}</div>
                             <div class="card-status status-${entry.status.toLowerCase()}" onclick="showStatusModal('${entry.id}')">
                                 ${entry.status}
                             </div>
                         </div>
                         <div class="card-details">
                             <div class="card-info-row">
-                                <span> ${entry.brand || 'Unknown'}</span>
-                                <span>${truncateText(entry.bank || 'Unknown Bank', 15)}</span>
+                                <span>💳 ${entry.brand || 'Unknown'}</span>
+                                <span>🏦 ${truncateText(entry.bank || 'Unknown Bank', 15)}</span>
                             </div>
                             <div class="card-info-row">
-                                <span> ${entry.expiry}</span>
-                                <span> ${entry.cvv}</span>
+                                <span>📅 ${entry.expiry}</span>
+                                <span>🔒 ${entry.cvv}</span>
                             </div>
                             <div class="card-info-row">
                                 <span>📍 ${entry.zip}</span>
@@ -1900,7 +1867,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
             if (entries.length === 0) {
                 binSections.innerHTML = `
                     <div style="text-align: center; color: #00ccff; padding: 40px 20px; background: rgba(0, 204, 255, 0.05); border-radius: 12px; border: 1px solid rgba(0, 204, 255, 0.2);">
-                        <div style="font-size: 2em; margin-bottom: 10px;"></div>
+                        <div style="font-size: 2em; margin-bottom: 10px;">📭</div>
                         <div style="font-size: 0.9em; margin-bottom: 8px;">No cards yet!</div>
                         <div style="font-size: 0.7em; opacity: 0.8;">Tap "Add" to get started</div>
                     </div>
@@ -1975,14 +1942,14 @@ Mixed formats OK - will auto-detect structure"></textarea>
                                     </div>
                                     <div class="card-details">
                                         <div class="card-info-row">
-                                            <span> ${entry.expiry}</span>
-                                            <span> ${entry.cvv}</span>
+                                            <span>📅 ${entry.expiry}</span>
+                                            <span>🔒 ${entry.cvv}</span>
                                         </div>
                                         <div class="card-info-row">
-                                            <span> ${entry.zip}</span>
-                                            <span> ${entry.state || 'N/A'}</span>
+                                            <span>📍 ${entry.zip}</span>
+                                            <span>🏠 ${entry.state || 'N/A'}</span>
                                         </div>
-                                        ${entry.name ? `<div class="card-info-row"><span> ${truncateText(entry.name, 30)}</span></div>` : ''}
+                                        ${entry.name ? `<div class="card-info-row"><span>👤 ${truncateText(entry.name, 30)}</span></div>` : ''}
                                     </div>
                                     <div class="card-actions">
                                         <button class="action-btn edit-btn" onclick="editEntry('${entry.id}')">✏️</button>
