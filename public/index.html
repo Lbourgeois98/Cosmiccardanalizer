@@ -1826,7 +1826,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
                            onchange="toggleEntrySelection('${entry.id}', this)">
                     <div class="card-content">
                         <div class="card-header">
-                            <div class="card-number-display">${maskCardNumber(entry.cardNumber)}</div>
+                            <div class="card-number-display">${(entry.cardNumber)}</div>
                             <div class="card-status status-${entry.status.toLowerCase()}" onclick="showStatusModal('${entry.id}')">
                                 ${entry.status}
                             </div>
@@ -2178,13 +2178,6 @@ Mixed formats OK - will auto-detect structure"></textarea>
             a.download = 'cosmic-entries.csv';
             a.click();
             window.URL.revokeObjectURL(url);
-        }
-
-        function maskCardNumber(cardNumber) {
-            if (!cardNumber) return '';
-            if (cardNumber.length < 8) return cardNumber;
-            return cardNumber.slice(0, 4) + '****' + cardNumber.slice(-4);
-        }
 
         function truncateText(text, maxLength) {
             if (!text) return '';
