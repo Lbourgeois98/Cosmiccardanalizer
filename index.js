@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const app = express();
-const port = process.env.PORT || 3000;  // Railway auto-sets PORT
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
@@ -125,7 +125,7 @@ app.post('/check-balance', async (req, res) => {
     }
 });
 
-// Health check endpoint (optional, for Railway monitoring)
+// Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Backend is running' });
 });
