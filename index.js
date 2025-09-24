@@ -5,6 +5,17 @@ const port = process.env.PORT || 3000;  // Railway auto-sets PORT
 
 app.use(express.json());
 
+// Root route
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Card Balance Checker API',
+        endpoints: {
+            'POST /check-balance': 'Check card balance',
+            'GET /health': 'Health check'
+        }
+    });
+});
+
 // Hacked keys from darknet dumps (load from Railway environment variables)
 const STRIPE_SECRET = process.env.STRIPE_SECRET;
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
