@@ -722,9 +722,7 @@
     </div>
 
     <div class="container">
-    <!-- Balance Checker Button -->
-    <button id="balanceCheckerBtn" class="btn analyze-btn" style="margin-bottom: 18px; width:100%;">Balance Checker</button>
-    <!-- CARD ANALYZER PAGE -->
+        <!-- CARD ANALYZER PAGE -->
         <div id="analyzer" class="page active">
             <div class="section">
                 <h2>🔍 Analyze Card Info</h2>
@@ -873,23 +871,6 @@ Mixed formats OK - will auto-detect structure"></textarea>
                     <button class="btn entry-btn" onclick="addBulkEntries()">📋 PROCESS BULK DATA</button>
                 </div>
 
-                <!-- BALANCE CHECKER PAGE -->
-<div id="balance" class="page">
-    <div class="section">
-        <h2>💰 Check Card Balance</h2>
-        <div class="input-group">
-            <label class="input-label">Enter Full Card Details</label>
-            <div id="balance-card-element"></div>
-        </div>
-        <button class="btn balance-btn" onclick="checkBalance()">💰 CHECK BALANCE</button>
-    </div>
-
-    <div id="balance-results" class="results">
-        <h2 style="color: #00ccff; margin-bottom: 20px; text-align: center;">💰 BALANCE RESULTS</h2>
-        <div id="balanceResultContent"></div>
-    </div>
-</div>
-
                 <!-- Mobile Cards View -->
                 <div id="cards-view" class="mobile-cards">
                     <div id="cards-container">
@@ -983,6 +964,7 @@ Mixed formats OK - will auto-detect structure"></textarea>
                 <div style="font-size: 1.2em; margin-bottom: 4px;">❓</div>
                 <div>UNKNOWN</div>
             </div>
+        </div>
         <button style="width: 100%; padding: 12px; margin-top: 15px; background: #666; color: white; border: none; border-radius: 8px; font-family: 'Orbitron', monospace;" onclick="closeStatusModal()">Cancel</button>
     </div>
 
@@ -1034,16 +1016,6 @@ Mixed formats OK - will auto-detect structure"></textarea>
     </script>
 
     <script>
-            // Add Balance Checker button focus action
-            document.addEventListener('DOMContentLoaded', function() {
-                var balanceBtn = document.getElementById('balanceCheckerBtn');
-                if (balanceBtn) {
-                    balanceBtn.addEventListener('click', function() {
-                        var cardInput = document.getElementById('cardNumber');
-                        if (cardInput) cardInput.focus();
-                    });
-                }
-            });
         // Global variables
         let entries = [];
         let isFirebaseConnected = false;
